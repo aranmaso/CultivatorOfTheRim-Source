@@ -234,7 +234,7 @@ namespace CultivatorOfTheRim
         public void MiscSetting(ref Listing_Standard listing_Standard)
         {
             listing_Standard.GapLine();
-            listing_Standard.CheckboxLabeled("Cultivation increase body HP", ref isCultivationAffectBodyHP, "can affect performance. use with care");
+            listing_Standard.CheckboxLabeled("Cultivation increase bodies HP", ref isCultivationAffectBodyHP, "can affect performance. use with care");
             listing_Standard.CheckboxLabeled("Add Cultivation caravan trader", ref isAddingCultivationTraderToFactionCaravan,
                 "since this mod itself doesn't add it own faction, this option add in a cultivation resource trader to all faction that isn't a permanent hostile");
             if (isAddingCultivationTraderToFactionCaravan)
