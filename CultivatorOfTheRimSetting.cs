@@ -323,68 +323,7 @@ namespace CultivatorOfTheRim
             Scribe_Values.Look(ref isCultivatorOfGoldenCoreOrSaintAndUpImmuneToMortal, "isCultivatorOfGoldenCoreOrSaintAndUpImmuneToMortal", true);
             Scribe_Values.Look(ref realmDifferentLimit, "realmDifferentLimit", 3);
             base.ExposeData();
-        }
-
-        /*public void DoSettingsWindowContents(Rect inRect)
-        {
-            Rect newRect = inRect;
-            Listing_Standard listing_Standard = new Listing_Standard();
-            listing_Standard.Begin(inRect);
-            listing_Standard.GapLine();
-            listing_Standard.Label("threshold multiplier for cultivation stage(default 1.00)");
-            listing_Standard.Label("*require restart");
-            severityMultiplierString = severityMultiplier.ToString(".00");
-            listing_Standard.TextFieldNumeric(ref severityMultiplier, ref severityMultiplierString, 0.01f, 10f);
-            listing_Standard.CheckboxLabeled("showing exp text", ref isShowingCultivateExpText, "if ON. when pawn meditate, a green text will show severity they gain per trigger");
-
-            listing_Standard.CheckboxLabeled("Chrono Stele and Beacon ticking sound", ref isPlayingTickingSound);
-
-            listing_Standard.CheckboxLabeled("wild animal auto cultivate", ref isWildAnimalAutoCultivate, "only affect those that spawn with cultivation");
-
-            listing_Standard.CheckboxLabeled("wild animal auto breakthrough", ref isWildAnimalAutoBreakthrought);
-
-            if (isWildAnimalAutoBreakthrought)
-            {
-                listing_Standard.CheckboxLabeled("wild animal obey safety threshold: " + tribulationSafety * 100 + "%", ref isWildAnimalIgnoreSafetyThresholdForBreakthrough,
-                "if On. animal will wait until Tribulation chance lowered to the minimum before attempting another breakthrough " +
-                "\nif Off. animal will attempting breakthrough ignoring their safety.");
-                if (isWildAnimalIgnoreSafetyThresholdForBreakthrough)
-                {
-                    tribulationSafetyString = tribulationSafety.ToString("0.00");
-                    listing_Standard.TextFieldNumeric(ref tribulationSafety, ref tribulationSafetyString, 0.00f, 1.00f);
-                }
-            }
-
-            listing_Standard.CheckboxLabeled("wild animal drop beast core", ref isAnimalDropBeastCore);
-
-            listing_Standard.CheckboxLabeled("pawn cultivation speed are affected by surrounding item", ref isCulSpeedAffectedByEnviaronment);
-
-            listing_Standard.CheckboxLabeled("food and rest cap", ref isNeedCapped, "if On. pawn of golden core or above will restore their food and rest need to 50% every 1 hour");
-
-            listing_Standard.CheckboxLabeled("Heavenly Tribulation change weather", ref isTribulationChangeWeather, "Rainy Thunderstorm count as a threat by storyteller. a lot of pawn/animal take turn summoning heavenly tribulation can prevent raid from spawning");
-            listing_Standard.CheckboxLabeled("Cultivation increase body HP", ref isCultivationAffectBodyHP, "can affect performance. use with care");
-            listing_Standard.CheckboxLabeled("Cultivation require Qi source", ref isCultivatorNeedQiSourceToImprove,
-                "if On: Pawn can't gain cultivation EXP without a Qi source in range." +
-                "\nif Off: Pawn can still gain a certain amount of exp without Qi source in range." +
-                "\nonly affect Cultivation in Qi Gathering stage and above");
-            listing_Standard.GapLine();
-            listing_Standard.CheckboxLabeled("Add Cultivation caravan trader", ref isAddingCultivationTraderToFactionCaravan,
-                "since this mod itself doesn't add it own faction, this option add in a cultivation resource trader to all faction that isn't a permanent hostile");
-            if (isAddingCultivationTraderToFactionCaravan)
-            {
-                listing_Standard.CheckboxLabeled("Add Cultivation base trader", ref isAddingCultivationTraderToFactionBase,
-                    "add Cultivation resource trader kind to all faction base" +
-                    "\nif On : all faction base can have cultivation resource/pill/manual as one of the possible trade type");
-            }
-            listing_Standard.End();
-
-            Rect rect = GenUI.LeftPart(GenUI.BottomPart(inRect, 0.1f), 0.1f);
-            if (Widgets.ButtonText(rect, "Save Settings", true, true, true))
-            {
-                ExposeData();
-                //CTR_StartPatch.ApplySettings();
-            }
-        }*/
+        }        
     }
     public class CultivatorOfTheRimMod : Mod
     {
