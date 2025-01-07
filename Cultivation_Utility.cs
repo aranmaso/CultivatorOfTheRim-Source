@@ -286,6 +286,72 @@ namespace CultivatorOfTheRim
         {
             return GenerateFromGaussian(1f, ItemGrade.Dao, ItemGrade.Earth, ItemGrade.Mortal);
         }
+        public static ItemGrade GenerateGradeForItem(this Thing item)
+        {
+            bool flag = item.TryGetQuality(out var qc);
+            QualityCategory itemQuality = qc;
+            if(flag)
+            {
+                if(item.IsRelic())
+                {
+                    return (ItemGrade)Rand.RangeInclusive((int)ItemGrade.Mysterious,(int)ItemGrade.Dao);
+                }
+                switch (itemQuality)
+                {
+                    case QualityCategory.Awful:
+                        return ItemGrade.Mortal;
+                    case QualityCategory.Poor:
+                        return ItemGrade.Mortal;
+                    case QualityCategory.Normal:
+                        return GenerateFromGaussian(1f, ItemGrade.Heaven, ItemGrade.Ordinary, ItemGrade.Mortal);
+                    case QualityCategory.Good:
+                        return GenerateFromGaussian(1f, ItemGrade.Mysterious, ItemGrade.Ordinary, ItemGrade.Mortal);
+                    case QualityCategory.Excellent:
+                        return GenerateFromGaussian(1f, ItemGrade.Mysterious, ItemGrade.Ordinary, ItemGrade.Mortal);
+                    case QualityCategory.Masterwork:
+                        return GenerateFromGaussian(1f, ItemGrade.Divine, ItemGrade.Ordinary, ItemGrade.Mortal);
+                    case QualityCategory.Legendary:
+                        return GenerateFromGaussian(1f, ItemGrade.Dao, ItemGrade.Ordinary, ItemGrade.Mortal);
+                }
+            }
+            else
+            {
+                float num = Rand.Value;
+                if (num <= 0.03f)
+                {
+                    return ItemGrade.Dao;
+                }
+                else if (num <= 0.05f)
+                {
+                    return ItemGrade.Emperor;
+                }
+                else if (num <= 0.10f)
+                {
+                    return ItemGrade.Divine;
+                }
+                else if (num <= 0.15f)
+                {
+                    return ItemGrade.Mysterious;
+                }
+                else if (num <= 0.25f)
+                {
+                    return ItemGrade.Heaven;
+                }
+                else if (num <= 0.35f)
+                {
+                    return ItemGrade.Earth;
+                }
+                else if (num <= 0.55f)
+                {
+                    return ItemGrade.Ordinary;
+                }
+                else
+                {
+                    return ItemGrade.Mortal;
+                }
+            }
+            return ItemGrade.Mortal;
+        }
         private static ItemGrade GenerateFromGaussian(float widthFactor, ItemGrade max = ItemGrade.Dao, ItemGrade center = ItemGrade.Ordinary, ItemGrade min = ItemGrade.Mortal)
         {
             float num = Rand.Gaussian((float)(int)center + 0.5f, widthFactor);
@@ -707,6 +773,28 @@ namespace CultivatorOfTheRim
             { CTR_DefOf.CTR_True_God, 0.003f},
             { CTR_DefOf.CTR_Creation_Realm, 0.0005f},
             { CTR_DefOf.CTR_OutsidetheDomain, 0.0005f}
+        };
+        public static Dictionary<HediffDef, float> RealmListChance = new Dictionary<HediffDef, float>()
+        {
+            { CTR_DefOf.CTR_BodyTempering, 15f},
+            { CTR_DefOf.CTR_MarrowCleansing, 14f},
+            { CTR_DefOf.CTR_BoneForging, 13f},
+            { CTR_DefOf.CTR_Qi_Gathering, 12f},
+            { CTR_DefOf.CTR_FoundationEstablishment, 11f},
+            { CTR_DefOf.CTR_CoreShaping, 10f},
+            { CTR_DefOf.CTR_GoldenCore, 9f},
+            { CTR_DefOf.CTR_NascentSoul, 8f},
+            { CTR_DefOf.CTR_Transcendent, 7f},
+            { CTR_DefOf.CTR_HalfStep_Saint, 6f},
+            { CTR_DefOf.CTR_SaintRealm, 5f},
+            { CTR_DefOf.CTR_SaintKing, 4f},
+            { CTR_DefOf.CTR_ImmortalAscension, 3f},
+            { CTR_DefOf.CTR_TrueImmortal, 2f},
+            { CTR_DefOf.CTR_ImmortalSaint, 1f},
+            { CTR_DefOf.CTR_HalfStep_God, 0.5f},
+            { CTR_DefOf.CTR_True_God, 0.03f},
+            { CTR_DefOf.CTR_Creation_Realm, 0.005f},
+            { CTR_DefOf.CTR_OutsidetheDomain, 0.005f}
         };
 
         public static Dictionary<HediffDef, float> RealmListMortalTransforming = new Dictionary<HediffDef, float>()

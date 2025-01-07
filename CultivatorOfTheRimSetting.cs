@@ -19,9 +19,15 @@ namespace CultivatorOfTheRim
 
         public bool isWildAnimalAutoCultivate = false;
 
+        public bool isOnlyColonyAnimalAutoCultivate = true;
+
         public bool isWildAnimalAutoBreakthrought = false;
 
+        public bool isColonyAnimalAutoBreakthrough = false;
+
         public bool isWildAnimalIgnoreSafetyThresholdForBreakthrough = false;
+
+        public bool isColonyAnimalIgnoreSafetyThresholdForBreakthrough = false;
 
         public bool isAnimalDropBeastCore = true;
 
@@ -71,6 +77,13 @@ namespace CultivatorOfTheRim
         public bool isCultivatorOfGoldenCoreOrSaintAndUpImmuneToMortal = true;
 
         public int realmDifferentLimit = 3;
+
+        public bool isWildItemSpawnWithGrade;
+
+        public float animalCultivationSpeedMultiplier;
+        public string animalCultivationSpeedMultiplierBuffer;
+
+        public bool isDeAgingPawn;
 
         private enum Tab
         {
@@ -166,9 +179,9 @@ namespace CultivatorOfTheRim
             listing_Standard.GapLine();
             listing_Standard.CheckboxLabeled("showing exp text", ref isShowingCultivateExpText, "if ON. when pawn meditate, a green text will show severity they gain per trigger");
             listing_Standard.CheckboxLabeled("Chrono Stele and Beacon ticking sound", ref isPlayingTickingSound);
-            listing_Standard.CheckboxLabeled("wild animal auto cultivate", ref isWildAnimalAutoCultivate, "only affect those that spawn with cultivation");
+            listing_Standard.CheckboxLabeled("animal auto cultivate", ref isWildAnimalAutoCultivate, "only affect those that spawn with cultivation");
+            listing_Standard.CheckboxLabeled("only colony animal auto cultivate", ref isOnlyColonyAnimalAutoCultivate, "only colony animal can auto cultivate");
             listing_Standard.CheckboxLabeled("wild animal auto breakthrough", ref isWildAnimalAutoBreakthrought);
-            listing_Standard.CheckboxLabeled("is allowing spirit plant wild spawn",ref isAllowWildSpiritPlantSpawn,"allow spirit plant to randomly spawn in the wild");
             if (isWildAnimalAutoBreakthrought)
             {
                 listing_Standard.CheckboxLabeled("wild animal obey safety threshold: " + tribulationSafety * 100 + "%", ref isWildAnimalIgnoreSafetyThresholdForBreakthrough,
@@ -180,6 +193,21 @@ namespace CultivatorOfTheRim
                     listing_Standard.TextFieldNumeric(ref tribulationSafety, ref tribulationSafetyString, 0.00f, 1.00f);
                 }
             }
+            listing_Standard.CheckboxLabeled("colony animal auto breakthrough", ref isColonyAnimalAutoBreakthrough);
+            if(isColonyAnimalAutoBreakthrough)
+            {
+                listing_Standard.CheckboxLabeled("colony animal obey safety rule: " + tribulationSafety * 100 + "%",ref isColonyAnimalIgnoreSafetyThresholdForBreakthrough, "if On. animal will wait until Tribulation chance lowered to the minimum before attempting another breakthrough " +
+                "\nif Off. animal will attempting breakthrough ignoring their safety.");
+                if (isColonyAnimalIgnoreSafetyThresholdForBreakthrough)
+                {
+                    tribulationSafetyString = tribulationSafety.ToString("0.00");
+                    listing_Standard.TextFieldNumeric(ref tribulationSafety, ref tribulationSafetyString, 0.00f, 1.00f);
+                }
+            }
+            listing_Standard.CheckboxLabeled("is allowing spirit plant wild spawn",ref isAllowWildSpiritPlantSpawn,"allow spirit plant to randomly spawn in the wild");
+            listing_Standard.Label("animal cultivation speed multiplier");
+            listing_Standard.TextFieldNumeric(ref animalCultivationSpeedMultiplier, ref animalCultivationSpeedMultiplierBuffer, 0.01f);
+            listing_Standard.CheckboxLabeled("is deaging pawn to 21",ref isDeAgingPawn,"from Golden Core and onward, deaging pawn to 21 biologically");
             listing_Standard.Gap(8f);
             if (listing_Standard.ButtonText("Reset General to default"))
             {
@@ -247,6 +275,7 @@ namespace CultivatorOfTheRim
             listing_Standard.CheckboxLabeled("plant fertility formation have a chance to age pawn",ref isFertilityFormationAgePawn, "plant fertility formation have a chance to age pawn");
             listing_Standard.CheckboxLabeled("workspeed nerf",ref isNerfingWorkSpeed,"nerf the global workspeed bonus and manipulation");
             listing_Standard.CheckboxLabeled("nerf Incoming Damage Modifier",ref isNerfingCultivatorIDM, "remove damage reduction from cultivation(Incoming Damage Modifier) entirely");
+            listing_Standard.CheckboxLabeled("non-player crafted item can spawn with grade", ref isWildItemSpawnWithGrade);
             listing_Standard.Gap(8f);
             if (listing_Standard.ButtonText("Reset Misc to default"))
             {
@@ -258,10 +287,14 @@ namespace CultivatorOfTheRim
             isShowingCultivateExpText = false;
             isPlayingTickingSound = true;
             isWildAnimalAutoCultivate = false;
+            isOnlyColonyAnimalAutoCultivate = true;
             isWildAnimalAutoBreakthrought = false;
             isWildAnimalIgnoreSafetyThresholdForBreakthrough = false;
+            isColonyAnimalAutoBreakthrough = false;
+            isColonyAnimalIgnoreSafetyThresholdForBreakthrough = false;
             tribulationSafety = 0.5f;
             isAllowWildSpiritPlantSpawn = true;
+            animalCultivationSpeedMultiplier = 1.00f;
         }
         public void DifficultyDefault()
         {
@@ -288,7 +321,8 @@ namespace CultivatorOfTheRim
             isFertilityFormationAffectSpiritPlant = false;
             isFertilityFormationAgePawn = true;
             isNerfingWorkSpeed = false;
-            isNerfingCultivatorIDM = false;            
+            isNerfingCultivatorIDM = false;
+            isWildItemSpawnWithGrade = true;
         }
 
         private static List<TabRecord> tabList = new List<TabRecord>();
@@ -298,8 +332,11 @@ namespace CultivatorOfTheRim
             Scribe_Values.Look(ref severityMultiplier, "severityMultiplier", 1f);
             Scribe_Values.Look(ref isPlayingTickingSound, "isPlayingTickingSound", false);
             Scribe_Values.Look(ref isWildAnimalAutoCultivate, "isWildAnimalAutoCultivate", false);
+            Scribe_Values.Look(ref isOnlyColonyAnimalAutoCultivate, "isOnlyColonyAnimalAutoCultivate", true);
             Scribe_Values.Look(ref isWildAnimalAutoBreakthrought, "isWildAnimalAutoBreakthrought", false);
+            Scribe_Values.Look(ref isColonyAnimalAutoBreakthrough, "isColonyAnimalAutoBreakthrough", false);
             Scribe_Values.Look(ref isWildAnimalIgnoreSafetyThresholdForBreakthrough, "isWildAnimalIgnoreSafetyThresholdForBreakthrough", false);
+            Scribe_Values.Look(ref isColonyAnimalIgnoreSafetyThresholdForBreakthrough, "isColonyAnimalIgnoreSafetyThresholdForBreakthrough", false);
             Scribe_Values.Look(ref tribulationSafety, "tribulationSafety", 0.01f);
             Scribe_Values.Look(ref isAnimalDropBeastCore, "isAnimalDropBeastCore", true);
             Scribe_Values.Look(ref isCulSpeedAffectedByEnviaronment, "isCulSpeedAffectedByEnviaronment", true);
@@ -322,6 +359,9 @@ namespace CultivatorOfTheRim
             Scribe_Values.Look(ref isAllowWildSpiritPlantSpawn, "isAllowWildSpiritPlantSpawn", true);
             Scribe_Values.Look(ref isCultivatorOfGoldenCoreOrSaintAndUpImmuneToMortal, "isCultivatorOfGoldenCoreOrSaintAndUpImmuneToMortal", true);
             Scribe_Values.Look(ref realmDifferentLimit, "realmDifferentLimit", 3);
+            Scribe_Values.Look(ref isWildItemSpawnWithGrade, "isWildItemSpawnWithGrade", true);
+            Scribe_Values.Look(ref animalCultivationSpeedMultiplier, "animalCultivationSpeedMultiplier", 1.00f);
+            Scribe_Values.Look(ref isDeAgingPawn, "isDeAgingPawn", true);
             base.ExposeData();
         }        
     }

@@ -13,6 +13,7 @@ namespace CultivatorOfTheRim
         {
             if (__result == null) return;
             //if (!__result.def.HasComp(typeof(CompQuality))) return;            
+            if (!CultivatorOfTheRimMod.settings.isWildItemSpawnWithGrade) return;
             if (!__result.def.HasComp(typeof(CompItemGrade))) return;            
             /*if (__result.def.Verbs.Any((VerbProperties v) => typeof(Verb_ShootOneUse).IsAssignableFrom(v.GetType())))
             {
@@ -26,7 +27,9 @@ namespace CultivatorOfTheRim
                     if(compItemGrade != null) 
                     {
                         ItemGrade result = ItemGrade.Mortal;
-                        float num = Rand.Value;
+                        result = __result.GenerateGradeForItem();
+                        compItemGrade.SetGrade(result);
+                        /*float num = Rand.Value;
                         if (num <= 0.03f)
                         {
                             result = ItemGrade.Dao;
@@ -66,7 +69,7 @@ namespace CultivatorOfTheRim
                         {
                             result = ItemGrade.Mortal;
                             compItemGrade.SetGrade(result);
-                        }
+                        }*/
 
 
                         /*ItemGrade newGrade = Cultivation_Utility.GenerateGradeTraderItem();
@@ -131,6 +134,12 @@ namespace CultivatorOfTheRim
                 ItemGrade g = Cultivation_Utility.GenerateGradeCreatedByPawn(worker);
                 if(Rand.Value <= refCha)
                 {
+                    if(g > ItemGrade.Ordinary)
+                    {
+                        MoteMaker.ThrowText(worker.DrawPos,worker.Map,"grade: " + g.ToString());
+                        //Messages.Message(worker.LabelShort + " has made " + __result.LabelCap + " with item grade of: " + g.ToString(),__result,MessageTypeDefOf.PositiveEvent,false);
+                        Messages.Message("PawnMakeItemHigherThanOrdinary".Translate(worker.LabelShort,__result.LabelCap,g.ToString(),worker.Named("USER")),__result,MessageTypeDefOf.PositiveEvent,false);
+                    }
                     compItemGrade.SetGrade(g);
                 }
                 else

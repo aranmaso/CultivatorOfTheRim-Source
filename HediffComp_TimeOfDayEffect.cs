@@ -30,7 +30,6 @@ namespace CultivatorOfTheRim
                 return false;
             }
         }
-
         public override void CompPostTick(ref float severityAdjustment)
         {
             base.CompPostTick(ref severityAdjustment);
@@ -44,7 +43,6 @@ namespace CultivatorOfTheRim
                 {
                     parent.Severity = Props.severityAtNight;
                 }
-
             }
         }
     }

@@ -14,7 +14,8 @@ namespace CultivatorOfTheRim
         private Dictionary<int, string> realmRange = new Dictionary<int, string>()
         {
             { 1, "Mortal Transforming"},
-            { 4, "Qi Cultivating"},
+            { 4, "Lower Qi Cultivating"},
+            { 10,"Upper Qi Cultivating"},
             { 13, "Heaven Ascending"},
             { 18, "Domain Ascending" }
         };
@@ -22,7 +23,8 @@ namespace CultivatorOfTheRim
         private Dictionary<int, string> realmRangeMax = new Dictionary<int, string>()
         {
             { 3, "Mortal Transforming"},
-            { 12, "Qi Cultivating"},
+            { 9, "Lower Qi Cultivating"},
+            { 12, "Upper Qi Cultivating"},
             { 17, "Heaven Ascending"},
             { 19, "Domain Ascending" }
         };
@@ -92,7 +94,7 @@ namespace CultivatorOfTheRim
             {
                 if (item.Key >= minRange && item.Key <= maxRange)
                 {
-                    hediffs.SetOrAdd(item.Value, Cultivation_Utility.RealmList[item.Value]);
+                    hediffs.SetOrAdd(item.Value, Cultivation_Utility.RealmListChance[item.Value]);
                 }
             }
             /*foreach (var item in minList)

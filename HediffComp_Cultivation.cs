@@ -52,6 +52,18 @@ namespace CultivatorOfTheRim
                 return false;
             }
         }
+
+        private bool isFixedAge
+        {
+            get
+            {
+                if(CultivatorOfTheRimMod.settings.isDeAgingPawn)
+                {
+                    return Cultivation_Utility.realmListAll[Def] >= 7;
+                }
+                return false;
+            }
+        }
         public float HealthScaleMul = 1f;
 
         public float CultivationSpeed = 1f;
@@ -124,16 +136,16 @@ namespace CultivatorOfTheRim
         {
             get
             { 
-            if(NeedListCached.NullOrEmpty() && !changeToNeedsEmptyCached)
-            {
-                foreach (var item in Props.changeToNeeds)
+                if(NeedListCached.NullOrEmpty() && !changeToNeedsEmptyCached)
                 {
-                    Need newNeed = Pawn.needs.TryGetNeed(item.needDef);
-                    NeedListInfoInner info = new NeedListInfoInner(newNeed,item.minValue);
-                    NeedListCached.Add(info);
-                };
-            }
-            return NeedListCached;
+                    foreach (var item in Props.changeToNeeds)
+                    {
+                        Need newNeed = Pawn.needs.TryGetNeed(item.needDef);
+                        NeedListInfoInner info = new NeedListInfoInner(newNeed,item.minValue);
+                        NeedListCached.Add(info);
+                    };
+                }
+                return NeedListCached;
             }
         }
         public override void CompPostTick(ref float severityAdjustment)
@@ -149,40 +161,60 @@ namespace CultivatorOfTheRim
             {
                 return;
             }
-            if(parent.pawn.IsHashIntervalTick(interval) && parent.Severity < parent.def.maxSeverity)
-            {          
-                if(Pawn.RaceProps.Humanlike)
+            if(Pawn.IsHashIntervalTick(60000))
+            {
+                if(isFixedAge)
+                {
+                    if(Pawn.ageTracker.AgeBiologicalYears > 21)
+                    {
+                        Pawn.ageTracker.AgeBiologicalTicks = 75600000;
+                        parent.pawn.ageTracker.ResetAgeReversalDemand(Pawn_AgeTracker.AgeReversalReason.ViaTreatment);
+                    }
+                }
+            }
+            if(Pawn.RaceProps.Humanlike)
+            {
+                if (parent.pawn.IsHashIntervalTick(interval) && parent.Severity < parent.def.maxSeverity)
                 {
                     if (Pawn.story?.traits?.GetTrait(CTR_DefOf.CTR_CultivationProdigy) != null || Pawn.story.AllBackstories.Contains(CTR_DefOf.CTR_ImmortalChild))
                     {
                         ProdigyCultivate();
                     }
-                    if(Pawn.story?.GetBackstory(BackstorySlot.Childhood) == CTR_DefOf.CTR_ImmortalChild)
+                    if (Pawn.story?.GetBackstory(BackstorySlot.Childhood) == CTR_DefOf.CTR_ImmortalChild)
                     {
                         ProdigyCultivate();
                     }
-                }                
-                if (parent.pawn.psychicEntropy.IsCurrentlyMeditating)
-                {
-                    
-                    IncreaseSeverity();
-                    if(requireQiSource && CultivatorOfTheRimMod.settings.isCulSpeedAffectedByEnviaronment)
+                    if (parent.pawn.psychicEntropy.IsCurrentlyMeditating)
                     {
-                        if (!isInitialChecked)
+                        IncreaseSeverity();
+                        if (requireQiSource && CultivatorOfTheRimMod.settings.isCulSpeedAffectedByEnviaronment)
                         {
-                            UpdateSourceList();
+                            if (!isInitialChecked)
+                            {
+                                UpdateSourceList();
+                            }
                         }
-                    }                    
-                }   
-                else
-                {
-                    if(requireQiSource && CultivatorOfTheRimMod.settings.isCulSpeedAffectedByEnviaronment)
+                    }
+                    else
                     {
-                        if (isInitialChecked)
+                        if (requireQiSource && CultivatorOfTheRimMod.settings.isCulSpeedAffectedByEnviaronment)
                         {
-                            isInitialChecked = false;
+                            if (isInitialChecked)
+                            {
+                                isInitialChecked = false;
+                            }
+                            if (!QiSourceList.NullOrEmpty())
+                            {
+                                QiSourceList.Clear();
+                                QiSourceWithType.Clear();
+                                QiSourceWithValue.Clear();
+                                QisourceTypeWithStringCached.Clear();
+                                itemToSpawnFleckList.Clear();
+                                multiplierForQiType = 1f;
+                                totalSeverityChange = 0f;
+                            }
                         }
-                        if (!QiSourceList.NullOrEmpty())
+                        if (!CultivatorOfTheRimMod.settings.isCulSpeedAffectedByEnviaronment && !QiSourceList.NullOrEmpty())
                         {
                             QiSourceList.Clear();
                             QiSourceWithType.Clear();
@@ -192,87 +224,147 @@ namespace CultivatorOfTheRim
                             multiplierForQiType = 1f;
                             totalSeverityChange = 0f;
                         }
-                    }       
-                    if(!CultivatorOfTheRimMod.settings.isCulSpeedAffectedByEnviaronment && !QiSourceList.NullOrEmpty())
-                    {
-                        QiSourceList.Clear();
-                        QiSourceWithType.Clear();
-                        QiSourceWithValue.Clear();
-                        QisourceTypeWithStringCached.Clear();
-                        itemToSpawnFleckList.Clear();
-                        multiplierForQiType = 1f;
-                        totalSeverityChange = 0f;
                     }
                 }
-            }
-            if(CultivatorOfTheRimMod.settings.isWildAnimalAutoCultivate)
-            {
-                if (Pawn.RaceProps.Animal)
-                {                    
-                    if (parent.Severity < parent.def.maxSeverity)
+                if (requireQiSource && parent.Severity < parent.def.maxSeverity && CultivatorOfTheRimMod.settings.isCulSpeedAffectedByEnviaronment)
+                {
+                    if (parent.pawn.IsHashIntervalTick(2500))
                     {
-                        if (parent.pawn.IsHashIntervalTick(interval))
+                        if (parent.pawn.psychicEntropy.IsCurrentlyMeditating && isNearbyQi)
                         {
-                            AnimalCultivate();
+                            UpdateSourceList();
+                        }
+                        else if (!parent.pawn.psychicEntropy.IsCurrentlyMeditating && !QiSourceList.NullOrEmpty())
+                        {
+                            QiSourceList.Clear();
+                            QiSourceWithType.Clear();
+                            QiSourceWithValue.Clear();
+                            QisourceTypeWithStringCached.Clear();
+                            itemToSpawnFleckList.Clear();
+                            multiplierForQiType = 1f;
+                            totalSeverityChange = 0f;
+                            isInitialChecked = false;
                         }
                     }
-                }
-            }      
-            if(CultivatorOfTheRimMod.settings.isWildAnimalAutoBreakthrought && (Pawn.RaceProps.Animal || Pawn.RaceProps.IsAnomalyEntity))
-            {                
-                if (Pawn.IsHashIntervalTick(interval))
-                {
-                    if (parent.Severity >= parent.def.maxSeverity)
-                    {                        
-                        if(!Pawn.health.hediffSet.HasHediff(CTR_DefOf.CTR_BreakthroughProcess))
+                    if (Pawn.IsHashIntervalTick(250))
+                    {
+                        if (Pawn.psychicEntropy.IsCurrentlyMeditating)
                         {
-                            if (CultivatorOfTheRimMod.settings.isWildAnimalIgnoreSafetyThresholdForBreakthrough)
+                            if (!QiSourceList.NullOrEmpty())
                             {
-                                if (Pawn.GetStatValue(CTR_DefOf.TribulationChance, cacheStaleAfterTicks: 250) > CultivatorOfTheRimMod.settings.tribulationSafety)
+                                CheckForItemChange();
+                                if (consumeSource)
                                 {
-                                    return;
+                                    ConsumeSource();
                                 }
                             }
-                            AnimalBreakthrought();
-                        }   
+                        }
                     }
                 }
-            }
-            if(requireQiSource && parent.Severity < parent.def.maxSeverity && CultivatorOfTheRimMod.settings.isCulSpeedAffectedByEnviaronment)
-            {
-                if (parent.pawn.IsHashIntervalTick(2500))
+                if (parent.Severity < parent.def.maxSeverity)
                 {
-                    if (parent.pawn.psychicEntropy.IsCurrentlyMeditating && isNearbyQi)
+                    if (isSpawningFleck && Pawn.psychicEntropy.IsCurrentlyMeditating)
                     {
-                        UpdateSourceList();
-                    }
-                    else if (!parent.pawn.psychicEntropy.IsCurrentlyMeditating && !QiSourceList.NullOrEmpty())
-                    {
-                        QiSourceList.Clear();
-                        QiSourceWithType.Clear();
-                        QiSourceWithValue.Clear();
-                        QisourceTypeWithStringCached.Clear();
-                        itemToSpawnFleckList.Clear();
-                        multiplierForQiType = 1f;
-                        totalSeverityChange = 0f;
-                        isInitialChecked = false;
-                    }
-                }
-                if(Pawn.IsHashIntervalTick(250))
-                {
-                    if(Pawn.psychicEntropy.IsCurrentlyMeditating)
-                    {
-                        if(!QiSourceList.NullOrEmpty())
+                        if (Pawn.IsHashIntervalTick(tickTillNextFleck))
                         {
-                            CheckForItemChange();
-                            if(consumeSource)
+                            if (!QiSourceList.NullOrEmpty())
                             {
-                                ConsumeSource();
+                                SpawnOrb();
+                            }
+                        }
+                    }
+                    else if (!Pawn.psychicEntropy.IsCurrentlyMeditating && isSpawningFleck)
+                    {
+                        isSpawningFleck = false;
+                        itemToSpawnFleckList.Clear();
+                    }
+                }
+            } 
+            if(Pawn.RaceProps.Animal || Pawn.RaceProps.IsAnomalyEntity)
+            {
+                if (CultivatorOfTheRimMod.settings.isWildAnimalAutoCultivate)
+                {
+                    if (parent.Severity < parent.def.maxSeverity)
+                    {
+                        if (CultivatorOfTheRimMod.settings.isOnlyColonyAnimalAutoCultivate)
+                        {
+                            if (Pawn.Faction == Faction.OfPlayer)
+                            {
+                                if (parent.pawn.IsHashIntervalTick(interval))
+                                {
+                                    AnimalCultivate();
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (parent.pawn.IsHashIntervalTick(interval))
+                            {
+                                AnimalCultivate();
+                            }
+                        }
+
+                    }
+                }
+                if (CultivatorOfTheRimMod.settings.isColonyAnimalAutoBreakthrough)
+                {
+                    if (Pawn.IsHashIntervalTick(interval))
+                    {
+                        if (parent.Severity >= parent.def.maxSeverity)
+                        {
+                            if (Pawn.Faction == Faction.OfPlayer)
+                            {
+                                if (Pawn.RaceProps.Animal || Pawn.RaceProps.IsAnomalyEntity)
+                                {
+                                    if (!Pawn.health.hediffSet.HasHediff(CTR_DefOf.CTR_BreakthroughProcess))
+                                    {
+                                        if (CultivatorOfTheRimMod.settings.isColonyAnimalIgnoreSafetyThresholdForBreakthrough)
+                                        {
+                                            if (Pawn.GetStatValue(CTR_DefOf.TribulationChance, cacheStaleAfterTicks: 250) <= CultivatorOfTheRimMod.settings.tribulationSafety)
+                                            {
+                                                AnimalBreakthrought();
+                                            }
+                                        }
+                                        else
+                                        {
+                                            AnimalBreakthrought();
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
                 }
-            }
+                if (CultivatorOfTheRimMod.settings.isWildAnimalAutoBreakthrought)
+                {
+                    if (Pawn.IsHashIntervalTick(interval))
+                    {
+                        if (Pawn.Faction != Faction.OfPlayer)
+                        {
+                            if (Pawn.RaceProps.Animal || Pawn.RaceProps.IsAnomalyEntity)
+                            {
+                                if (parent.Severity >= parent.def.maxSeverity)
+                                {
+                                    if (!Pawn.health.hediffSet.HasHediff(CTR_DefOf.CTR_BreakthroughProcess))
+                                    {
+                                        if (CultivatorOfTheRimMod.settings.isWildAnimalIgnoreSafetyThresholdForBreakthrough)
+                                        {
+                                            if (Pawn.GetStatValue(CTR_DefOf.TribulationChance, cacheStaleAfterTicks: 250) <= CultivatorOfTheRimMod.settings.tribulationSafety)
+                                            {
+                                                AnimalBreakthrought();
+                                            }
+                                        }
+                                        else
+                                        {
+                                            AnimalBreakthrought();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }                                         
 
             if (parent.pawn.IsHashIntervalTick(2500) && CultivatorOfTheRimMod.settings.isNeedCapped)
             {
@@ -287,25 +379,7 @@ namespace CultivatorOfTheRim
                         }
                     }
                 }
-            }
-            if (parent.Severity < parent.def.maxSeverity)
-            {
-                if (isSpawningFleck && Pawn.psychicEntropy.IsCurrentlyMeditating)
-                {
-                    if (Pawn.IsHashIntervalTick(tickTillNextFleck))
-                    {
-                        if (!QiSourceList.NullOrEmpty())
-                        {
-                            SpawnOrb();
-                        }
-                    }
-                }
-                else if (!Pawn.psychicEntropy.IsCurrentlyMeditating && isSpawningFleck)
-                {
-                    isSpawningFleck = false;
-                    itemToSpawnFleckList.Clear();
-                }
-            }
+            }            
             
         }
 
@@ -864,7 +938,7 @@ namespace CultivatorOfTheRim
         }
         public void AnimalCultivate()
         {
-            float sev = Props.severityPerTriggerRange.RandomInRange;
+            float sev = Props.severityPerTriggerRange.RandomInRange * CultivationSpeed * CultivatorOfTheRimMod.settings.animalCultivationSpeedMultiplier;
             if(parent.Severity < parent.def.maxSeverity)
             {
                 parent.Severity += sev;

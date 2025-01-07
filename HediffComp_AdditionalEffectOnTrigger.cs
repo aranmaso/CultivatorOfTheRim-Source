@@ -17,6 +17,7 @@ namespace CultivatorOfTheRim
 
         public int cooldownTick = 0;
 
+        public bool isCurActivated = true;
         /*public SorcerySchema sorcerySchema;
         public SorcerySchema sorcerySchemaGet
         {
@@ -44,12 +45,38 @@ namespace CultivatorOfTheRim
         {
             base.CompExposeData();
             Scribe_Values.Look(ref cooldownTick,"cooldownTick",0);
+            Scribe_Values.Look(ref isCurActivated, "isCurActivated", true);
+        }
+        public override IEnumerable<Gizmo> CompGetGizmos()
+        {
+            if(Props.hasUiIcon)
+            {
+                Command_Toggle activeToggle = new Command_Toggle();
+                if (isCurActivated)
+                {
+                    activeToggle.defaultLabel = "additonal attack: ON";
+                    activeToggle.defaultDesc = "pawn currently launch additional attack along with their normal one";
+                }
+                else
+                {
+                    activeToggle.defaultLabel = "additonal attack: OFF";
+                    activeToggle.defaultDesc = "pawn no longer launch additional attack";
+                }
+                activeToggle.icon = ContentFinder<Texture2D>.Get(Props.uiIcon);
+                activeToggle.isActive = () => isCurActivated;
+                activeToggle.toggleAction = delegate
+                {
+                    isCurActivated = !isCurActivated;
+                };
+                yield return activeToggle;
+            }            
         }
         public override void Notify_PawnPostApplyDamage(DamageInfo dinfo, float totalDamageDealt)
         {
             base.Notify_PawnPostApplyDamage(dinfo, totalDamageDealt);
             if (dinfo.Instigator == null) return;
             if (dinfo.Instigator == Pawn) return;
+            if (!isCurActivated) return;
             if (!Props.onAttacked) return;
             if (Props.bonusDamageDef != null)
             {
@@ -145,6 +172,7 @@ namespace CultivatorOfTheRim
             if (verb.GetType() == typeof(Verb_FirefoamPop)) return;
             if (verb.GetType() == typeof(Verb_Spawn)) return;*/
             base.Notify_PawnUsedVerb(verb, target);
+            if (!isCurActivated) return;
             if (!Props.onAttack) return;
             if (Props.cooldown > 0 && cooldownTick > 0) return;
             if(Props.bonusDamageDef != null)

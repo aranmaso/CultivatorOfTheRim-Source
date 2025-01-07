@@ -256,12 +256,13 @@ namespace CultivatorOfTheRim
             };
             foreach (var item in list)
             {
-                if (item.thingClass == typeof(Apparel) || item.thingClass.IsSubclassOf(typeof(Apparel)) || item.HasComp(typeof(CompEquippable)))
+                item.comps.Add(comp);
+                /*if (item.thingClass == typeof(Apparel) || item.thingClass.IsSubclassOf(typeof(Apparel)) || item.HasComp(typeof(CompEquippable)))
                 {
-                    item.comps.Add(comp);
-                }
+                    
+                }*/
             }
-            Log.Message("Add Grade to item complete");
+            //Log.Message("Add Grade to item complete");
             List<ThingDef> pillList = DefDatabase<ThingDef>.AllDefs.Where(InjectPredicatePill).ToList();
             CompProperties compPill = new CompProperties
             {
@@ -271,7 +272,7 @@ namespace CultivatorOfTheRim
             {
                 item.comps.AddDistinct(compPill);
             }
-            Log.Message("Add Grade to Pill complete");
+            //Log.Message("Add Grade to Pill complete");
         }
         private static bool CTRStatDefPredicate(StatDef def)
         {
@@ -321,23 +322,27 @@ namespace CultivatorOfTheRim
 
         private static bool InjectPredicate(ThingDef def)
         {
-            if(def.HasComp(typeof(CompEquippable)))
-            {
-                return true;
-            }
-            if (!def.HasComp(typeof(CompQuality)))
-            {
-                return false;
-            }
-            /*if (def.Verbs.Any((VerbProperties v) => typeof(Verb_ShootOneUse).IsAssignableFrom(v.GetType())))
-            {
-                return false;
-            }*/
             if (def.BaseMarketValue <= 0)
             {
                 return false;
             }
-            return true;
+            if (def.HasComp(typeof(CompEquippable)) || def.HasComp(typeof(CompEquippableAbilityReloadable)) || def.HasComp(typeof(CompEquippableAbility)))
+            {
+                return true;
+            }
+            if(def.thingClass == typeof(Apparel) || def.thingClass.IsSubclassOf(typeof(Apparel)))
+            {
+                return true;
+            }
+            /*if (!def.HasComp(typeof(CompQuality)))
+            {
+                return false;
+            }*/
+            /*if (def.Verbs.Any((VerbProperties v) => typeof(Verb_ShootOneUse).IsAssignableFrom(v.GetType())))
+            {
+                return false;
+            }*/            
+            return false;
         }
 
         private static bool InjectPredicatePill(ThingDef def)

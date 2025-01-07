@@ -45,6 +45,10 @@ namespace CultivatorOfTheRim
 
         public bool isSelfResurrect;
 
+        public string uiIcon;
+
+        public bool hasUiIcon;
+
         /*[MayRequire("zomuro.itssorcery")]
         public SorcerySchemaDef sorcerySchemaDef;
 

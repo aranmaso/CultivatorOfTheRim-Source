@@ -5,6 +5,8 @@ using System.Linq;
 using Verse.Noise;
 using UnityEngine;
 using VFECore;
+using UnityEngine.Assertions.Must;
+using UnityEngine.Assertions;
 
 namespace CultivatorOfTheRim
 {
@@ -98,6 +100,11 @@ namespace CultivatorOfTheRim
                         bool flag = billDoer.InspirationDef == InspirationDefOf.Inspired_Creativity;
                         float count = GetAmountResult(Cultivation_Utility.realmListAll[level.def], modExtension.count.min, modExtension.count.max, flag);
                         newThing.stackCount = modExtension.count.RandomInRange;
+                        CompItemGrade compItemGrade = newThing.TryGetComp<CompItemGrade>();
+                        if(compItemGrade != null)
+                        {
+                            compItemGrade?.SetGrade(Cultivation_Utility.GenerateGradeCreatedByPawn(billDoer));
+                        }                        
                         GenPlace.TryPlaceThing(newThing, billDoer.Position, billDoer.Map, ThingPlaceMode.Near);
                         Messages.Message("mixing success! " + billDoer.LabelShort + " made a " + newThing.LabelCap, MessageTypeDefOf.PositiveEvent);
                     }

@@ -166,7 +166,6 @@
     <Publicize Include="Assembly-CSharp:RimWorld.StatWorker.stat" />
     <Publicize Include="Assembly-CSharp:RimWorld.WorkGiver_GrowerSow.ExtraRequirements" />
     <Publicize Include="Assembly-CSharp:RimWorld.WorkGiver_Grower.wantedPlantDef" />
-    <Publicize Include="Assembly-CSharp:Verse.Listing.listingRect" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
