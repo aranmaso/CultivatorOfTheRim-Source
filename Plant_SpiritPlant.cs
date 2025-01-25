@@ -1,4 +1,5 @@
 ﻿using RimWorld;
+using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -57,6 +58,9 @@ namespace CultivatorOfTheRim
         public int dayOfYear => GenLocalDate.DayOfYear(Map);
 
         private Season season => GenLocalDate.Season(Map);
+
+        private Quadrum quadrum => GenDate.Quadrum(GenTicks.TicksAbs, Find.WorldGrid.LongLatOf(Map.Tile).x);
+
         private PlantExtension_SpiritPlant modExtensionGet;
         private PlantExtension_SpiritPlant modExtension
         {
@@ -130,30 +134,55 @@ namespace CultivatorOfTheRim
                 }
                 if(modExtension.isAffectBySeason)
                 {
-                    switch(season)
+                    if(CultivatorOfTheRimMod.settings.isUsingQuadrum)
                     {
-                        case Season.Undefined:
-                            Season_Bonus = 1f;
-                            break;
-                        case Season.Spring:
-                            Season_Bonus = modExtension.seasonCurves.Evaluate(1);
-                            break;
-                        case Season.Summer:
-                            Season_Bonus = modExtension.seasonCurves.Evaluate(2);
-                            break;
-                        case Season.Fall:
-                            Season_Bonus = modExtension.seasonCurves.Evaluate(3);
-                            break;
-                        case Season.Winter:
-                            Season_Bonus = modExtension.seasonCurves.Evaluate(4);
-                            break;
-                        case Season.PermanentSummer:
-                            Season_Bonus = modExtension.seasonCurves.Evaluate(5);
-                            break;
-                        case Season.PermanentWinter:
-                            Season_Bonus = modExtension.seasonCurves.Evaluate(6);
-                            break;
+                        switch(quadrum)
+                        {
+                            case Quadrum.Aprimay:
+                                Season_Bonus = modExtension.seasonCurves.Evaluate(1);
+                                break;
+                            case Quadrum.Jugust:
+                                Season_Bonus = modExtension.seasonCurves.Evaluate(2);
+                                break;
+                            case Quadrum.Septober:
+                                Season_Bonus = modExtension.seasonCurves.Evaluate(3);
+                                break;
+                            case Quadrum.Decembary:
+                                Season_Bonus = modExtension.seasonCurves.Evaluate(4);
+                                break;
+                            default:
+                                Season_Bonus = 1f;
+                                break;
+
+                        }
                     }
+                    else
+                    {
+                        switch (season)
+                        {
+                            case Season.Undefined:
+                                Season_Bonus = 1f;
+                                break;
+                            case Season.Spring:
+                                Season_Bonus = modExtension.seasonCurves.Evaluate(1);
+                                break;
+                            case Season.Summer:
+                                Season_Bonus = modExtension.seasonCurves.Evaluate(2);
+                                break;
+                            case Season.Fall:
+                                Season_Bonus = modExtension.seasonCurves.Evaluate(3);
+                                break;
+                            case Season.Winter:
+                                Season_Bonus = modExtension.seasonCurves.Evaluate(4);
+                                break;
+                            case Season.PermanentSummer:
+                                Season_Bonus = modExtension.seasonCurves.Evaluate(5);
+                                break;
+                            case Season.PermanentWinter:
+                                Season_Bonus = modExtension.seasonCurves.Evaluate(6);
+                                break;
+                        }
+                    }                    
                 }
                 if(modExtension.ignoreTemp)
                 {
@@ -335,10 +364,37 @@ namespace CultivatorOfTheRim
                 }
                 if(specificMonthHarvestable)
                 {
-                    if(!modExtension.specificMonthHarvestable.Contains(season))
+                    if(CultivatorOfTheRimMod.settings.isUsingQuadrum)
                     {
-                        return false;
+                        Season curSeason = Season.Undefined;
+                        switch(quadrum)
+                        {
+                            case Quadrum.Aprimay:
+                                curSeason = Season.Spring;
+                                break;
+                            case Quadrum.Jugust:
+                                curSeason = Season.Summer;
+                                break;
+                            case Quadrum.Septober:
+                                curSeason = Season.Fall;
+                                break;
+                            case Quadrum.Decembary:
+                                curSeason = Season.Winter;
+                                break;
+                        }
+                        if (!modExtension.specificMonthHarvestable.Contains(curSeason))
+                        {
+                            return false;
+                        }
+
                     }
+                    else
+                    {
+                        if (!modExtension.specificMonthHarvestable.Contains(season))
+                        {
+                            return false;
+                        }
+                    }                    
                     return base.HarvestableNow;
                 }
                 return base.HarvestableNow;
@@ -347,7 +403,8 @@ namespace CultivatorOfTheRim
         public void PreventGrowthIfForbiddenInRange()
         {
             //clear thing out of range or null
-            for (int i = 0; i < forbiddenThingNearby.Count; i++)
+            IReadOnlyList<Thing> list = new List<Thing>(forbiddenThingNearby);
+            for (int i = 0; i < list.Count; i++)
             {
                 if (forbiddenThingNearby[i].DestroyedOrNull() || forbiddenThingNearby[i].Position.DistanceToSquared(Position) > (modExtension.radius * modExtension.radius))
                 {
@@ -391,7 +448,8 @@ namespace CultivatorOfTheRim
             //clear thing out of range or null
             if(!specialThingNearby.NullOrEmpty())
             {
-                for (int i = 0; i < specialThingNearby.Count; i++)
+                IReadOnlyList<Thing> list = new List<Thing>(specialThingNearby);
+                for (int i = 0; i < list.Count; i++)
                 {
                     if (specialThingNearby[i].DestroyedOrNull() || specialThingNearby[i].Position.DistanceToSquared(Position) > (modExtension.radius * modExtension.radius))
                     {
@@ -447,8 +505,9 @@ namespace CultivatorOfTheRim
                 //Log.Message("list not empty");                
                 //int thingNearbyCount = thingNearby.Count;
                 //Log.Message("get list count: " + thingNearbyCount);
+                IReadOnlyList<Thing> tempList = new List<Thing>(thingNearby);
                 float num = modExtension.radius * modExtension.radius;
-                for (int i = 0; i < thingNearby.Count - 1; i++)
+                for (int i = 0; i < tempList.Count - 1; i++)
                 {
                     if (thingNearby[i].DestroyedOrNull())
                     {
@@ -498,7 +557,7 @@ namespace CultivatorOfTheRim
                         }
 
                     }
-                }                
+                }   
             }            
             if (!thingNearbyWithCurMul.NullOrEmpty())
             {
@@ -778,7 +837,7 @@ namespace CultivatorOfTheRim
         /*public override void SpawnSetup(Map map, bool respawningAfterLoad)
         {
             base.SpawnSetup(map, respawningAfterLoad);
-            if(modExtension.requireSource)
+            if (modExtension.requireSource)
             {
                 foreach (var item in GenRadial.RadialDistinctThingsAround(Position, Map, modExtension.radius, true))
                 {
@@ -789,7 +848,7 @@ namespace CultivatorOfTheRim
                     if (!modExtension.excludedThing.NullOrEmpty() && modExtension.excludedThing.Contains(item.def))
                     {
                         continue;
-                    }                   
+                    }
                     else if (!item.def.tradeTags.NullOrEmpty() && item.def != def)
                     {
                         if (item.def.tradeTags.Any(x => modExtension.allowedTags.Contains(x)))
@@ -805,7 +864,7 @@ namespace CultivatorOfTheRim
                 }
                 foreach (var item in GenRadial.RadialDistinctThingsAround(Position, Map, modExtension.radius, true))
                 {
-                    if(thingNearbyWithCurMul.ContainsKey(item))
+                    if (thingNearbyWithCurMul.ContainsKey(item))
                     {
                         continue;
                     }
@@ -819,7 +878,7 @@ namespace CultivatorOfTheRim
                     }
                 }
             }
-            if(modExtension.isStopGrowingIfThingInRange)
+            if (modExtension.isStopGrowingIfThingInRange)
             {
                 foreach (var item in GenRadial.RadialDistinctThingsAround(Position, Map, modExtension.forbiddenRange, false))
                 {
@@ -854,24 +913,24 @@ namespace CultivatorOfTheRim
                                 break;
                             }
                         }
-                        *//*if (num > curMul)
+                        if (num > curMul)
                         {
                             curMul = num;
-                        }*//*                        
-                        if(!thingNearby.Contains(item))
+                        }
+                        if (!thingNearby.Contains(item))
                         {
                             thingNearby.Add(item);
                         }
-                        if(!thingNearbyWithCurMul.ContainsKey(item))
+                        if (!thingNearbyWithCurMul.ContainsKey(item))
                         {
                             thingNearbyWithCurMul.Add(item, num);
                             curMul += num;
-                        }                        
+                        }
                         numberOfSource++;
                     }
                 }
             }
-            if(modExtension.requireSpecialSource)
+            if (modExtension.requireSpecialSource)
             {
                 foreach (var item in GenRadial.RadialDistinctThingsAround(Position, Map, modExtension.radius, false))
                 {
@@ -893,7 +952,7 @@ namespace CultivatorOfTheRim
                     }
                 }
             }
-            
+
         }*/
         public override string GetInspectString()
         {            
@@ -1050,15 +1109,41 @@ namespace CultivatorOfTheRim
             }
             if(modExtension.isAffectBySeason)
             {
-                if(season == Season.PermanentWinter && modExtension.seasonCurves.Evaluate(5) == 0)
+                if(CultivatorOfTheRimMod.settings.isUsingQuadrum)
                 {
-                    stringBuilder.AppendInNewLine("PermanentSummerDisabledGrow".Translate());
+                    switch (quadrum)
+                    {
+                        case Quadrum.Aprimay:
+                            stringBuilder.AppendInNewLine("season multiplier: " + modExtension.seasonCurves.Evaluate(1).ToStringPercent("0"));
+                            break;
+                        case Quadrum.Jugust:
+                            stringBuilder.AppendInNewLine("season multiplier: " + modExtension.seasonCurves.Evaluate(2).ToStringPercent("0"));
+                            break;
+                        case Quadrum.Septober:
+                            stringBuilder.AppendInNewLine("season multiplier: " + modExtension.seasonCurves.Evaluate(3).ToStringPercent("0"));
+                            break;
+                        case Quadrum.Decembary:
+                            stringBuilder.AppendInNewLine("season multiplier: " + modExtension.seasonCurves.Evaluate(4).ToStringPercent("0"));
+                            break;
+                        default:
+                            stringBuilder.AppendInNewLine("Undefined Quadrum");
+                            break;
+
+                    }
                 }
-                if(season == Season.PermanentWinter && modExtension.seasonCurves.Evaluate(6) == 0)
+                else
                 {
-                    stringBuilder.AppendInNewLine("PermanentWinterDisabledGrow".Translate());
+                    if (season == Season.PermanentWinter && modExtension.seasonCurves.Evaluate(5) == 0)
+                    {
+                        stringBuilder.AppendInNewLine("PermanentSummerDisabledGrow".Translate());
+                    }
+                    if (season == Season.PermanentWinter && modExtension.seasonCurves.Evaluate(6) == 0)
+                    {
+                        stringBuilder.AppendInNewLine("PermanentWinterDisabledGrow".Translate());
+                    }
+                    stringBuilder.AppendInNewLine("season multiplier: " + modExtension.seasonCurves.Evaluate((int)season).ToStringPercent("0"));
                 }
-                stringBuilder.AppendInNewLine("season multiplier: " + modExtension.seasonCurves.Evaluate((int)season).ToStringPercent("0"));
+                
             }
             return stringBuilder.ToString().TrimEndNewlines();
         }

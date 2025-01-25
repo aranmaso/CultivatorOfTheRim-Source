@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Verse.Noise;
 using UnityEngine;
-using VFECore;
 using UnityEngine.Assertions.Must;
 using UnityEngine.Assertions;
 

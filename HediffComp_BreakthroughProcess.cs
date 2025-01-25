@@ -40,7 +40,7 @@ namespace CultivatorOfTheRim
                 if (Rand.Value <= chance)
                 {
                     string text = "Breakingthrough!";
-                    string text2 = Pawn.LabelShort + " " + "has breakthrough from " + " " + curLevel.LabelCap + " to " + " " + nextLevel.LabelCap;
+                    string text2 = Pawn.LabelShort + " " + "has breakthrough from " + curLevel.LabelCap + " to " + nextLevel.LabelCap;
                     Find.LetterStack.ReceiveLetter(text, text2, LetterDefOf.PositiveEvent, parent.pawn);
 
                     Pawn.health.RemoveHediff(Pawn.health.hediffSet.GetFirstHediffOfDef(curLevel));
@@ -90,13 +90,16 @@ namespace CultivatorOfTheRim
                     {
                         Pawn.Map?.weatherManager?.eventHandler?.AddEvent(new WeatherEvent_LightningStrikeTribulation(Pawn.Map, Pawn.Position, 0, 3));
                     }
-                    Pawn.health.hediffSet.GetFirstHediffOfDef(CTR_DefOf.CTR_BreakthroughCounter).Severity = 0.5f;
+                    if(Pawn.health.hediffSet.GetFirstHediffOfDef(CTR_DefOf.CTR_BreakthroughCounter).Severity > 0.5f)
+                    {
+                        Pawn.health.hediffSet.GetFirstHediffOfDef(CTR_DefOf.CTR_BreakthroughCounter).Severity = 0.5f;
+                    }
                 }
             }
             else
             {
                 string text = "Breakingthrough!";
-                string text2 = Pawn.LabelShort + " " + "has breakthrough from " + " " + curLevel.LabelCap + " to " + " " + nextLevel.LabelCap;
+                string text2 = Pawn.LabelShort + " " + "has breakthrough from " + curLevel.LabelCap + " to " + nextLevel.LabelCap;
                 Find.LetterStack.ReceiveLetter(text, text2, LetterDefOf.PositiveEvent, parent.pawn);
 
                 Pawn.health.RemoveHediff(Pawn.health.hediffSet.GetFirstHediffOfDef(curLevel));

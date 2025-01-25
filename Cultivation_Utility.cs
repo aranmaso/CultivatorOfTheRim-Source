@@ -20,6 +20,67 @@ namespace CultivatorOfTheRim
 
             return tinfo;
         }
+        
+        public static bool TryGiveCultivationBasedOnBackstory(Pawn pawn)
+        {
+            if (pawn.HaveCultivation())
+            {
+                return false;
+            }
+            else
+            {
+                if (!pawn.RaceProps.Humanlike) return false;
+                if (pawn.story == null) return false;
+                if(pawn.story.AllBackstories.Any(x => backstoryDefs.Keys.Contains(x)))
+                {
+                    if (pawn.DevelopmentalStage.Child())
+                    {
+                        if (pawn.story?.Childhood == null) return false;
+                        int num = backstoryDefs[pawn.story.Childhood];
+                        int num2 = Rand.RangeInclusive(0, 1);
+                        int num3 = num + num2;
+                        HediffDef cultivationRealm = realmListRanking[num3];
+                        Hediff hediff = CreateHediffNoDuration(pawn, cultivationRealm);
+                        hediff.Severity = hediff.def.stages.RandomElement().minSeverity;
+                        pawn.health.AddHediff(hediff);
+                        if (!pawn.health.hediffSet.HasHediff(CTR_DefOf.CTR_BreakthroughCounter))
+                        {
+                            Hediff hediff2 = CreateHediffNoDuration(pawn, CTR_DefOf.CTR_BreakthroughCounter);
+                            pawn.health.AddHediff(hediff2);
+                        }
+                        return true;
+                    }
+                    else
+                    {
+                        if (pawn.story?.Adulthood == null) return false;
+                        int num = 0;
+                        if(backstoryDefs.Keys.Contains(pawn.story.Adulthood))
+                        {
+                            num = backstoryDefs[pawn.story.Adulthood];
+                        }
+                        int num1 = 0;
+                        if(backstoryDefs.Keys.Contains(pawn.story.Childhood))
+                        {
+                            num1 = backstoryDefs[pawn.story.Childhood];
+                        }
+                        if (num1 > num) num = num1;
+                        int num2 = Rand.RangeInclusive(0, 1);
+                        int num3 = num + num2;
+                        HediffDef cultivationRealm = realmListRanking[num3];
+                        Hediff hediff = CreateHediffNoDuration(pawn, cultivationRealm);
+                        hediff.Severity = hediff.def.stages.RandomElement().minSeverity;
+                        pawn.health.AddHediff(hediff);
+                        if (!pawn.health.hediffSet.HasHediff(CTR_DefOf.CTR_BreakthroughCounter))
+                        {
+                            Hediff hediff2 = CreateHediffNoDuration(pawn, CTR_DefOf.CTR_BreakthroughCounter);
+                            pawn.health.AddHediff(hediff2);
+                        }
+                        return true;
+                    }
+                }                                
+            }
+            return false;
+        }
         public static Hediff_CultivationLevel FindCultivationLevel(Pawn pawn)
         {
             Hediff_CultivationLevel hediff_CultivationLevel = null;
@@ -35,7 +96,7 @@ namespace CultivatorOfTheRim
             return null;
             
         }
-        public static bool HaveCultivation(Pawn p)
+        public static bool HaveCultivation(this Pawn p)
         {
             for(int i = 0;i < p.health.hediffSet.hediffs.Count; i++)
             {
@@ -705,6 +766,23 @@ namespace CultivatorOfTheRim
             }
             return text;
         }
+        public static IDictionary<BackstoryDef, int> backstoryDefs = new Dictionary<BackstoryDef, int>()
+        {
+            //childhood
+            { CTR_DefOf.CTR_GeniusChild,5},
+            { CTR_DefOf.CTR_ImmortalChild,6},
+            { CTR_DefOf.CTR_ArrogantYoungMaster,5},
+
+            //adulthood
+            { CTR_DefOf.CTR_Saintess,7},
+            { CTR_DefOf.CTR_InnerDis,4},
+            { CTR_DefOf.CTR_OuterDis,3},
+            { CTR_DefOf.CTR_ExiledDis,4},
+            { CTR_DefOf.CTR_AlchemyDis,5},
+            { CTR_DefOf.CTR_DemonDis,6},
+            { CTR_DefOf.CTR_SectMaster,8},
+            { CTR_DefOf.CTR_SectElder,7}
+        };
 
         public static IDictionary<HediffDef,int > realmListAll = new Dictionary<HediffDef, int>()
         {

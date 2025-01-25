@@ -85,6 +85,8 @@ namespace CultivatorOfTheRim
 
         public bool isDeAgingPawn;
 
+        public bool isUsingQuadrum;
+
         private enum Tab
         {
             GeneralSetting,
@@ -207,7 +209,9 @@ namespace CultivatorOfTheRim
             listing_Standard.CheckboxLabeled("is allowing spirit plant wild spawn",ref isAllowWildSpiritPlantSpawn,"allow spirit plant to randomly spawn in the wild");
             listing_Standard.Label("animal cultivation speed multiplier");
             listing_Standard.TextFieldNumeric(ref animalCultivationSpeedMultiplier, ref animalCultivationSpeedMultiplierBuffer, 0.01f);
-            listing_Standard.CheckboxLabeled("is deaging pawn to 21",ref isDeAgingPawn,"from Golden Core and onward, deaging pawn to 21 biologically");
+            listing_Standard.CheckboxLabeled("is de-aging pawn to 21",ref isDeAgingPawn,"from Golden Core and onward, deaging pawn to 21 biologically");
+            listing_Standard.CheckboxLabeled("seasonal spirit plant using Quadrum",ref isUsingQuadrum,"if On: seasonal spirit plant that require specific season will use current quadrum for season instead of actual season, this mean a map with permanent summer will still able to growth seasonal plant." +
+                "\nif Off: default behavior, seasonal spirit plant will use current season for growth check. this mean map with permanent summer will never be able to grow certain plant.");
             listing_Standard.Gap(8f);
             if (listing_Standard.ButtonText("Reset General to default"))
             {
@@ -295,6 +299,7 @@ namespace CultivatorOfTheRim
             tribulationSafety = 0.5f;
             isAllowWildSpiritPlantSpawn = true;
             animalCultivationSpeedMultiplier = 1.00f;
+            isUsingQuadrum = false;
         }
         public void DifficultyDefault()
         {
@@ -362,6 +367,7 @@ namespace CultivatorOfTheRim
             Scribe_Values.Look(ref isWildItemSpawnWithGrade, "isWildItemSpawnWithGrade", true);
             Scribe_Values.Look(ref animalCultivationSpeedMultiplier, "animalCultivationSpeedMultiplier", 1.00f);
             Scribe_Values.Look(ref isDeAgingPawn, "isDeAgingPawn", true);
+            Scribe_Values.Look(ref isUsingQuadrum, "isUsingQuadrum", true);
             base.ExposeData();
         }        
     }

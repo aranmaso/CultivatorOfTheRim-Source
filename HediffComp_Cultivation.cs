@@ -174,6 +174,24 @@ namespace CultivatorOfTheRim
             }
             if(Pawn.RaceProps.Humanlike)
             {
+                if(!Pawn.Spawned)
+                {
+                    if (isInitialChecked)
+                    {
+                        isInitialChecked = false;
+                    }
+                    if (!QiSourceList.NullOrEmpty())
+                    {
+                        QiSourceList.Clear();
+                        QiSourceWithType.Clear();
+                        QiSourceWithValue.Clear();
+                        QisourceTypeWithStringCached.Clear();
+                        itemToSpawnFleckList.Clear();
+                        multiplierForQiType = 1f;
+                        totalSeverityChange = 0f;
+                    }
+                    return;
+                }
                 if (parent.pawn.IsHashIntervalTick(interval) && parent.Severity < parent.def.maxSeverity)
                 {
                     if (Pawn.story?.traits?.GetTrait(CTR_DefOf.CTR_CultivationProdigy) != null || Pawn.story.AllBackstories.Contains(CTR_DefOf.CTR_ImmortalChild))
@@ -448,7 +466,7 @@ namespace CultivatorOfTheRim
                         comps.DistributeQi(num);
                     }
                 }
-            }            
+            }
             foreach (var item in QiSourceList)
             {
                 if(item.DestroyedOrNull())
@@ -552,42 +570,11 @@ namespace CultivatorOfTheRim
             num *= 12f;
             Map map = Pawn.Map;
             Cultivation_Utility.ThrowObjectAt(map, vector3, Pawn.DrawPos, GetQiOrbType(type), 0.25f + num, 0.25f + num);
-            /*switch (QisourceTypeWithStringGet[item])
-            {
-                case null:
-                    break;
-                case "Neutral_Qi":
-                    Cultivation_Utility.ThrowObjectAt(map, vector, Pawn.DrawPos, CTR_DefOf.CTR_AbsorbQiOrbPure, 0.25f + num, 0.25f + num);
-                    break;
-                case "Yang_Qi":
-                    Cultivation_Utility.ThrowObjectAt(map, vector, Pawn.DrawPos, CTR_DefOf.CTR_AbsorbQiOrbPure, 0.25f + num, 0.25f + num);
-                    break;
-                case "Yin_Qi":
-                    Cultivation_Utility.ThrowObjectAt(map, vector, Pawn.DrawPos, CTR_DefOf.CTR_AbsorbQiOrbPure, 0.25f + num, 0.25f + num);
-                    break;
-                case "Cold_Qi":
-                    Cultivation_Utility.ThrowObjectAt(map, vector, Pawn.DrawPos, CTR_DefOf.CTR_AbsorbQiOrbWater, 0.25f + num, 0.25f + num);
-                    break;
-                case "Metal_Qi":
-                    Cultivation_Utility.ThrowObjectAt(map, vector, Pawn.DrawPos, CTR_DefOf.CTR_AbsorbQiOrbMetal, 0.25f + num, 0.25f + num);
-                    break;
-                case "Water_Qi":
-                    Cultivation_Utility.ThrowObjectAt(map, vector, Pawn.DrawPos, CTR_DefOf.CTR_AbsorbQiOrbWater, 0.25f + num, 0.25f + num);
-                    break;
-                case "Wood_Qi":
-                    Cultivation_Utility.ThrowObjectAt(map, vector, Pawn.DrawPos, CTR_DefOf.CTR_AbsorbQiOrbWood, 0.25f + num, 0.25f + num);
-                    break;
-                case "Fire_Qi":
-                    Cultivation_Utility.ThrowObjectAt(map, vector, Pawn.DrawPos, CTR_DefOf.CTR_AbsorbQiOrbFire, 0.25f + num, 0.25f + num);
-                    break;
-                case "Earth_Qi":
-                    Cultivation_Utility.ThrowObjectAt(map, vector, Pawn.DrawPos, CTR_DefOf.CTR_AbsorbQiOrbEarth, 0.25f + num, 0.25f + num);
-                    break;
-            }*/
         }
         public void CheckForItemChange()
         {
-            for(int i = 0;i < QiCrystalList.Count - 1;i++)
+            IReadOnlyList<Thing> crystalList = new List<Thing>(QiCrystalList);
+            for(int i = 0;i < crystalList.Count - 1;i++)
             {
                 Thing tempThing = QiSourceList[i];                
                 if (tempThing.DestroyedOrNull())
@@ -604,7 +591,8 @@ namespace CultivatorOfTheRim
                     QiCrystalList.Remove(tempThing);
                 }*/
             }
-            for(int i = 0;i < QiSourceList.Count - 1;i++)
+            IReadOnlyList<Thing> sourceList = new List<Thing>(QiSourceList);
+            for (int i = 0;i < sourceList.Count - 1;i++)
             {
                 Thing tempThing = QiSourceList[i];
                 if (!tempThing.Spawned || tempThing.Map == null)
@@ -998,7 +986,7 @@ namespace CultivatorOfTheRim
                 {
                     if (Find.CameraDriver.CurrentViewRect.Contains(Pawn.Position))
                     {
-                        MoteMaker.ThrowText(Pawn.Position.ToVector3(), Pawn.Map, sev.ToString("0.000"), Color.green);
+                        MoteMaker.ThrowText(Pawn.Position.ToVector3Shifted(), Pawn.Map, sev.ToString("0.000"), Color.green);
                     }
                 }                               
             }

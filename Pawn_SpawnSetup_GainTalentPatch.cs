@@ -6,18 +6,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Verse;
-using VFECore;
 
 namespace CultivatorOfTheRim
 {
     [HarmonyPatch(typeof(Pawn))]
     [HarmonyPatch("SpawnSetup")]
-    public class Pawn_SpawnSetup_Patch
+    public class Pawn_SpawnSetup_GainTalentPatch
     {
 
         private static Dictionary<TraitDef, float> talentTrait = new Dictionary<TraitDef, float>()
         {
-            {CTR_DefOf.CTR_MediocreTalent, 0.75f },
+            {CTR_DefOf.CTR_MediocreTalent, 0.60f },
             {CTR_DefOf.CTR_GoodTalent,0.5f },
             {CTR_DefOf.CTR_CultivationProdigy,0.1f}
         };

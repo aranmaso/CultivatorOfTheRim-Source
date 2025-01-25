@@ -130,6 +130,7 @@ namespace CultivatorOfTheRim
             Scribe_Defs.Look(ref choosenPaymentOption, "choosenPaymentOption");
             Scribe_Defs.Look(ref choosenCategoryDef, "choosenCategoryDef");
             Scribe_References.Look(ref bidder, "bidder", saveDestroyedThings: true);
+            Scribe_References.Look(ref choosenBidder, "choosenBidder", false);
             if (currentItemOnAuction is Pawn)
             {
                 Scribe_References.Look(ref sellingItem, "sellingItem", true);
@@ -234,7 +235,7 @@ namespace CultivatorOfTheRim
             {
                 if (bidder != null && bidder.Faction.IsPlayer)
                 {
-                    CalculatePayment(choosenPaymentOption, bidder, currentBid);
+                    CalculatePayment(choosenPaymentOption, parent.Map, currentBid);
                 }
                 else if (!currentAuctionItemList.NullOrEmpty())
                 {
@@ -469,7 +470,14 @@ namespace CultivatorOfTheRim
                 yield return raiseBid;
 
                 Command_Action chooseBidder = new Command_Action();
-                chooseBidder.defaultLabel = "Choose Bidder";
+                if(choosenBidder == null)
+                {
+                    chooseBidder.defaultLabel = "Choose Bidder";
+                }
+                else
+                {
+                    chooseBidder.defaultLabel = "Bidder: " + choosenBidder;
+                }
                 chooseBidder.icon = ContentFinder<Texture2D>.Get(Props.uiIcon);
                 chooseBidder.action = delegate
                 {
@@ -973,10 +981,10 @@ namespace CultivatorOfTheRim
             }
             return stringBuilder.ToString().TrimEndNewlines();
         }
-        public void CalculatePayment(ThingDef payment, Pawn pawn, int finalBid)
+        public void CalculatePayment(ThingDef payment, Map map, int finalBid)
         {
             int finalPrice = Mathf.FloorToInt(finalBid / payment.BaseMarketValue);
-            bool enoughMoney = ColonyHasEnoughMoney(payment, pawn.Map, finalPrice);
+            bool enoughMoney = ColonyHasEnoughMoney(payment, map, finalPrice);
             if (!enoughMoney)
             {
                 Messages.Message("Not Enough " + payment.LabelCap + "!", MessageTypeDefOf.NegativeEvent);
@@ -995,8 +1003,8 @@ namespace CultivatorOfTheRim
             }
             else
             {
-                TradeUtility.LaunchThingsOfType(payment, finalPrice, pawn.Map, null);
-                SpawnDropPod(pawn.Map, currentItemOnAuction);
+                TradeUtility.LaunchThingsOfType(payment, finalPrice, map, null);
+                SpawnDropPod(parent.Map, currentItemOnAuction);
                 if (!currentAuctionItemList.NullOrEmpty())
                 {
                     GetNewAuctionItem();
@@ -1073,8 +1081,8 @@ namespace CultivatorOfTheRim
                 if (!droplist.EnumerableNullOrEmpty())
                 {
                     dropSpot = droplist.RandomElement();
-                }
-                if (droplist.EnumerableNullOrEmpty())
+                }                
+                /*if (droplist.EnumerableNullOrEmpty())
                 {
                     foreach (var item in Building_OrbitalTradeBeacon.AllPowered(map).InRandomOrder())
                     {
@@ -1085,7 +1093,7 @@ namespace CultivatorOfTheRim
                         dropSpot = item.TradeableCells.RandomElement();
                         break;
                     }
-                }
+                }*/
             }
 
             /*if (dropSpot == null)
@@ -1098,10 +1106,11 @@ namespace CultivatorOfTheRim
                 activeDropPodInfo.SingleContainedThing = newThing;
                 activeDropPodInfo.leaveSlag = false;
                 DropPodUtility.MakeDropPodAt(dropSpot, map, activeDropPodInfo);
+                Messages.Message("your " + newThing.Label + " has arrive!",newThing,MessageTypeDefOf.PositiveEvent);
             }
             else
             {
-                foreach (var item in Building_OrbitalTradeBeacon.AllPowered(map).InRandomOrder())
+                /*foreach (var item in Building_OrbitalTradeBeacon.AllPowered(map).InRandomOrder())
                 {
                     dropSpot = item.TradeableCells.RandomElement();
                     break;
@@ -1109,8 +1118,11 @@ namespace CultivatorOfTheRim
                 if (dropSpot == null)
                 {
                     dropSpot = parent.Position.RandomAdjacentCell8Way();
-                }
+                }*/
+                dropSpot = GenRadial.RadialCellsAround(parent.Position, 4f, true).Where(x => map.reachability.CanReachColony(x)).RandomElement();
+
                 GenPlace.TryPlaceThing(newThing, dropSpot, parent.Map, ThingPlaceMode.Near);
+                Messages.Message("your " + newThing.Label + " has arrive!",newThing,MessageTypeDefOf.PositiveEvent);
                 Effecter effecter = ModsConfig.RoyaltyActive ? EffecterDefOf.Skip_Entry.Spawn(dropSpot, parent.Map) : EffecterDefOf.ExtinguisherExplosion.Spawn(dropSpot, parent.Map);
                 effecter.Cleanup();
                 if (ModsConfig.RoyaltyActive)

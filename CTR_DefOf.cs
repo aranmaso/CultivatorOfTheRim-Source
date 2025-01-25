@@ -39,8 +39,6 @@ namespace CultivatorOfTheRim
         public static BodyPartDef Brain;
         public static BodyPartDef Stomach;
 
-        public static BackstoryDef CTR_ImmortalChild;
-
         public static TraderKindDef Caravan_CultivationResource;
         public static TraderKindDef Caravan_CultivationPill;
         public static TraderKindDef Caravan_CultivationTechnique;
@@ -129,6 +127,18 @@ namespace CultivatorOfTheRim
         public static TraitDef CTR_GoodTalent;
         public static TraitDef CTR_CultivationProdigy;
         public static TraitDef CTR_PeerlessEmpress;
+
+        public static BackstoryDef CTR_GeniusChild;
+        public static BackstoryDef CTR_ImmortalChild;
+        public static BackstoryDef CTR_ArrogantYoungMaster;
+        public static BackstoryDef CTR_Saintess;
+        public static BackstoryDef CTR_InnerDis;
+        public static BackstoryDef CTR_OuterDis;
+        public static BackstoryDef CTR_ExiledDis;
+        public static BackstoryDef CTR_AlchemyDis;
+        public static BackstoryDef CTR_DemonDis;
+        public static BackstoryDef CTR_SectMaster;
+        public static BackstoryDef CTR_SectElder;
 
     }
 }
