@@ -14,7 +14,6 @@ namespace CultivatorOfTheRim
         private RecipeExtension_MixingIngredient modExtension => recipe.GetModExtension<RecipeExtension_MixingIngredient>();
 
         private bool passRequirement = false;        
-
         public override void Notify_IterationCompleted(Pawn billDoer, List<Thing> ingredients)
         {
             base.Notify_IterationCompleted(billDoer, ingredients);

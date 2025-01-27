@@ -90,7 +90,9 @@ namespace CultivatorOfTheRim
 
         public static ThinkTreeDef Humanlike;
 
-
+        public static StuffCategoryDef Metallic;
+        public static StuffCategoryDef Woody;
+        public static StuffCategoryDef Stony;
 
         public static StatDef CTR_Qi_AbsorptionMultiplier;
         public static StatDef CTR_YangQi_AbsorptionMultiplier;
@@ -139,6 +141,5 @@ namespace CultivatorOfTheRim
         public static BackstoryDef CTR_DemonDis;
         public static BackstoryDef CTR_SectMaster;
         public static BackstoryDef CTR_SectElder;
-
     }
 }

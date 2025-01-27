@@ -3,6 +3,8 @@ using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using UnityEngine;
 using Verse;
 
 namespace CultivatorOfTheRim
@@ -13,7 +15,7 @@ namespace CultivatorOfTheRim
     {
         static CTR_StartPatch()
         {
-            new Harmony("FarmerJoe.CultivatorOfTheRim").PatchAll();
+            //new Harmony("FarmerJoe.CultivatorOfTheRim").PatchAll();
             Log.Message("Finishing introducing cultivation to the rim");
             Inject();
             if(CultivatorOfTheRimMod.settings.severityMultiplier != 1.00f)
@@ -257,10 +259,6 @@ namespace CultivatorOfTheRim
             foreach (var item in list)
             {
                 item.comps.Add(comp);
-                /*if (item.thingClass == typeof(Apparel) || item.thingClass.IsSubclassOf(typeof(Apparel)) || item.HasComp(typeof(CompEquippable)))
-                {
-                    
-                }*/
             }
             //Log.Message("Add Grade to item complete");
             List<ThingDef> pillList = DefDatabase<ThingDef>.AllDefs.Where(InjectPredicatePill).ToList();
@@ -273,6 +271,232 @@ namespace CultivatorOfTheRim
                 item.comps.AddDistinct(compPill);
             }
             //Log.Message("Add Grade to Pill complete");
+
+            //inject Qi Type to item
+            /*foreach(var item in DefDatabase<ThingDef>.AllDefsListForReading.Where(InjectQiType))
+            {
+                if(item.category == ThingCategory.Item)
+                {
+                    if (item.modContentPack != null && item.modContentPack?.PackageId == "aranmaho.xianxia") continue;
+
+                    StringBuilder stringBuilder = new StringBuilder();
+                    stringBuilder.Append(item.description);
+                    stringBuilder.AppendLine();
+                    stringBuilder.AppendLine();
+                    string tags = null;
+                    if (item.IsStuff)
+                    {
+                        if (!item.stuffProps.categories.NullOrEmpty())
+                        {
+                            bool hasQiTag = false;
+                            if (item.stuffProps.categories.Any(ShouldHaveQiTags))
+                            {
+                                hasQiTag = true;
+                            }
+                            if (hasQiTag)
+                            {                                                                
+                                foreach (var category in item.stuffProps.categories)
+                                {
+                                    if (category == CTR_DefOf.Metallic)
+                                    {
+                                        if (item.tradeTags == null)
+                                        {
+                                            item.tradeTags = new List<string>();
+                                        }
+                                        item.tradeTags.Add("Metal_Qi");
+                                        tags += "Metal_Qi".Colorize(Color.yellow);
+                                        tags += ",";
+                                    }
+                                    if (category == CTR_DefOf.Stony)
+                                    {
+                                        if (item.tradeTags == null)
+                                        {
+                                            item.tradeTags = new List<string>();
+                                        }
+                                        item.tradeTags.Add("Earth_Qi");
+                                        tags += "Earth_Qi".Colorize(new Color(0.54f, 0.27f, 0.07f));
+                                        tags += ",";
+                                    }
+                                    if (category == CTR_DefOf.Woody)
+                                    {
+                                        if (item.tradeTags == null)
+                                        {
+                                            item.tradeTags = new List<string>();
+                                        }
+                                        item.tradeTags.Add("Wood_Qi");
+                                        tags += "Wood_Qi".Colorize(Color.green);
+                                        tags += ",";
+                                    }
+                                }                                                               
+                            }                            
+                        }                        
+                    }
+                    if(!item.thingCategories.NullOrEmpty() && item.thingCategories.Contains(ThingCategoryDefOf.StoneChunks))
+                    {
+                        if (item.tradeTags == null)
+                        {
+                            item.tradeTags = new List<string>();
+                        }
+                        item.tradeTags.Add("Earth_Qi");
+                        tags += "Earth_Qi".Colorize(new Color(0.54f, 0.27f, 0.07f));
+                        tags += ",";
+                    }
+                    if(item.thingClass == typeof(Medicine) || item.thingClass.IsSubclassOf(typeof(Medicine)))
+                    {
+                        if (item.tradeTags == null)
+                        {
+                            item.tradeTags = new List<string>();
+                        }
+                        item.tradeTags.Add("Healing_Item");
+                        tags += "Healing_Item".Colorize(Color.green);
+                        tags += ",";
+                    }
+                    IEnumerable<string> fire = new List<string>()
+                    {
+                        "fire","hot","heat","star","sun","flame"
+                    };
+                    if (fire.Any(x => item.label.ToLower().Contains(x)))
+                                {
+                        if (item.tradeTags == null)
+                        {
+                            item.tradeTags = new List<string>();
+                        }
+                        item.tradeTags.Add("Fire_Qi");
+                        tags += "Fire_Qi".Colorize(Color.red);
+                        tags += ",";
+                    }
+
+                    IEnumerable<string> icy = new List<string>()
+                    {
+                        "ice","frozen","freeze","cold","frigid","water","icy","frost"
+                    };
+                    if (icy.Any(x => item.label.ToLower().Contains(x)))
+                    {
+                        if (item.tradeTags == null)
+                        {
+                            item.tradeTags = new List<string>();
+                        }
+                        item.tradeTags.Add("Water_Qi");
+                        tags += "Water_Qi".Colorize(Color.blue);
+                        tags += ",";
+                    }
+                    IEnumerable<string> yinCold = new List<string>()
+                    {
+                        "death","soul"
+                    };
+                    if(yinCold.Any(x => item.label.ToLower().Contains(x)))
+                    {
+                        if (item.tradeTags == null)
+                        {
+                            item.tradeTags = new List<string>();
+                        }
+                        item.tradeTags.Add("Cold_Qi");
+                        item.tradeTags.Add("Yin_Qi");
+                        tags += "Cold_Qi".Colorize(Color.cyan);
+                        tags += ",";
+                        tags += "Yin_Qi".Colorize(Color.cyan);
+                        tags += ",";
+                    }
+                    IEnumerable<string> celestial = new List<string>()
+                    {
+                        "celestial","star","divine","holy"
+                    };
+                    if(celestial.Any(x => item.label.ToLower().Contains(x)))
+                    {
+                        if (item.tradeTags == null)
+                        {
+                            item.tradeTags = new List<string>();
+                        }
+                        item.tradeTags.Add("Immortal_Qi");
+                        tags += "Immortal_Qi".Colorize(Color.cyan);
+                        tags += ",";
+                    }
+                    if(item.label.ToLower().Contains("existence"))
+                    {
+                        if (item.tradeTags == null)
+                        {
+                            item.tradeTags = new List<string>();
+                        }
+                        item.tradeTags.Add("Qi_Source");
+                        item.tradeTags.Add("Qi_Source_Tier6");
+                        item.tradeTags.Add("Unlimited_Source");
+                        item.tradeTags.Add("Neutral_Qi");
+                        item.tradeTags.Add("Cold_Qi");
+                        item.tradeTags.Add("Yin_Qi");
+                        item.tradeTags.Add("Yang_Qi");
+                        item.tradeTags.Add("Fire_Qi");
+                        item.tradeTags.Add("Water_Qi");
+                        item.tradeTags.Add("Wood_Qi");
+                        item.tradeTags.Add("Earth_Qi");
+                        item.tradeTags.Add("Metal_Qi");
+                        item.tradeTags.Add("Pure_Qi");
+                        item.tradeTags.Add("Saint_Qi");
+                        item.tradeTags.Add("Heavenly_Qi");
+                        item.tradeTags.Add("Immortal_Qi");
+                        foreach (var tradeTags in item.tradeTags)
+                        {
+                            tags += tradeTags;
+                            tags += ",";
+                            tags += "\n";
+                        }
+                        
+                    }
+                    if(tags != null)
+                    {
+                        stringBuilder.AppendLine("Tags: " + tags);
+                        item.description = stringBuilder.ToString().TrimEndNewlines();
+                    }                    
+                }
+                else
+                {
+                    continue;
+                }
+            }
+            static bool ShouldHaveQiTags(StuffCategoryDef stuffDef)
+            {
+                if(stuffDef == CTR_DefOf.Metallic) return true;
+                if(stuffDef == CTR_DefOf.Woody) return true;
+                if(stuffDef == CTR_DefOf.Stony) return true;
+                return false;
+            }*/
+
+            //add recipe info to mixing
+            foreach (var item in DefDatabase<RecipeDef>.AllDefsListForReading.Where(x => x == CTR_DefOf.CTR_MakeAlchemy || x == CTR_DefOf.CTR_MakeTalisman))
+            {
+                if(item == CTR_DefOf.CTR_MakeAlchemy)
+                {
+                    StringBuilder stringBuilder = new StringBuilder();
+                    stringBuilder.Append(item.description);
+                    stringBuilder.AppendLine();
+                    stringBuilder.AppendLine();
+                    stringBuilder.AppendLine("recipe list");
+                    stringBuilder.AppendLine();
+                    foreach (var recipe in item.GetModExtension<RecipeExtension_MixingIngredient>().combinations)
+                    {
+                        stringBuilder.AppendLine("first tag: ".Colorize(Color.green) + recipe.firstTag);
+                        stringBuilder.AppendLine("second tag: ".Colorize(Color.green) + recipe.secondTag);
+                        stringBuilder.AppendLine("result: ".Colorize(Color.green) + recipe.result.label);
+                        stringBuilder.AppendLine();
+                    }
+                    item.description = stringBuilder.ToString().TrimEndNewlines();
+                }
+                else if(item == CTR_DefOf.CTR_MakeTalisman)
+                {
+                    StringBuilder stringBuilder = new StringBuilder();
+                    stringBuilder.Append(item.description);
+                    stringBuilder.AppendLine();
+                    stringBuilder.AppendLine("recipe list");
+                    stringBuilder.AppendLine();
+                    foreach (var recipe in item.GetModExtension<RecipeExtension_MixingIngredient>().combinations)
+                    {
+                        stringBuilder.AppendLine("first tag: ".Colorize(Color.green) + recipe.firstTag);
+                        stringBuilder.AppendLine("second tag: ".Colorize(Color.green) + recipe.secondTag);
+                        stringBuilder.AppendLine("result: ".Colorize(Color.green) + recipe.result.label);
+                        stringBuilder.AppendLine();
+                    }
+                    item.description = stringBuilder.ToString().TrimEndNewlines();
+                }
+            }
         }
         private static bool CTRStatDefPredicate(StatDef def)
         {
@@ -320,6 +544,14 @@ namespace CultivatorOfTheRim
             return true;
         }
 
+        private static bool InjectQiType(ThingDef def)
+        {
+            if(def.category == ThingCategory.Item)
+            {
+                return true;
+            }
+            return false;
+        }
         private static bool InjectPredicate(ThingDef def)
         {
             if (def.BaseMarketValue <= 0)

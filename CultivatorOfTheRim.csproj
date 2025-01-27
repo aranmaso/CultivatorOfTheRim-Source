@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="BookOutcomeProperties_TechniqueManual.cs" />
     <Compile Include="BookOutcomeDoerTechniqueManual.cs" />
+    <Compile Include="DefGenerator_GenerateImpliedDefs_PreResolve_Patch.cs" />
     <Compile Include="PawnGenerator_GenerateInitialHediffsPatch.cs" />
     <Compile Include="StatPart_GradeDamage.cs" />
     <Compile Include="HediffComp_Cultivation_New.cs" />

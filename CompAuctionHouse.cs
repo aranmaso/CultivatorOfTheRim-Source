@@ -27,16 +27,6 @@ namespace CultivatorOfTheRim
         public bool isSellingPawn = false;
 
         public List<ThingCategoryDef> thingCategoryDefChoice => Props.categoryChoice;
-            ThingCategoryDefOf.Weapons,
-            ThingCategoryDefOf.Manufactured,
-            ThingCategoryDefOf.Medicine,
-            ThingCategoryDefOf.Neurotrainers,
-            ThingCategoryDefOf.Drugs,
-            RimAuction_DefOf.Artifacts,
-            ThingCategoryDefOf.Buildings,
-            ThingCategoryDefOf.BuildingsArt,
-            ThingCategoryDefOf.BuildingsSpecial
-        };*/
 
         public ThingCategoryDef choosenCategoryDef = ThingCategoryDefOf.Weapons;
 
