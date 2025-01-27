@@ -27,8 +27,6 @@ namespace CultivatorOfTheRim
         public bool isSellingPawn = false;
 
         public List<ThingCategoryDef> thingCategoryDefChoice => Props.categoryChoice;
-        /*{
-            ThingCategoryDefOf.Apparel,
             ThingCategoryDefOf.Weapons,
             ThingCategoryDefOf.Manufactured,
             ThingCategoryDefOf.Medicine,
