@@ -1,6 +1,7 @@
 ﻿using RimWorld;
 using Verse;
 using System.Collections.Generic;
+using RimWorld.Planet;
 
 namespace CultivatorOfTheRim
 {
@@ -29,6 +30,7 @@ namespace CultivatorOfTheRim
         {
             SetGrade(Cultivation_Utility.GeneratePillGradeTraderItem());
         }
+
         public override bool AllowStackWith(Thing other)
         {
             if (Cultivation_Utility.TryGetPillGrade(other, out var qc))

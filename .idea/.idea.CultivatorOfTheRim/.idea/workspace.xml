@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="CMakeProjectFlavorService">
+    <option name="flavorId" value="CMakePlainProjectFlavor" />
+  </component>
+  <component name="CMakeSettings">
+    <configurations />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="5091c950-5cc1-4096-b7f8-b3473239172c" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.CultivatorOfTheRim/.idea/indexLayout.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.CultivatorOfTheRim/.idea/projectSettingsUpdater.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.CultivatorOfTheRim/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.CultivatorOfTheRim/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BonusHediff.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BreakThroughRealmInfo.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CTR_SuperStartPatch.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompAbilityEffect_VoidTear.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompProperties_AbilityEffectVoidTear.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompProperties_UseEffectBeastCoreAbsorption.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompProperties_UseEffectConsumeGenericPill.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompProperties_UseEffectConsumeQiPill.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompProperties_UseEffectPlaySound.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompProperties_UseEffectRebirth.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompUseEffect_BeastCoreAbsorption.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompUseEffect_ConsumeGenericPill.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompUseEffect_ConsumeQiPill.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompUseEffect_PlaySound.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CompUseEffect_Rebirth.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CultivationHediffDef.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CultivationHediffStage.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Cultivation_AttachableThing.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DebugToolsGeneral_CTR.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DefModExtension_RealmRankingPower.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FactionCultivationDef.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GameComponent_CultivatorCacheManager.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HediffCompProperties_BodyCultivation.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HediffCompProperties_CultivatorResurrect.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HediffCompProperties_GiveAbilityCultivator.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HediffComp_BodyCultivation.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HediffComp_CultivatorResurrect.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HediffComp_GiveAbilityCultivator.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HediffStageData.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Hediff_BodyCultivaton.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Hediff_CultivationBase.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Hediff_DynamicStage.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ITab_Cultivation.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/IngestionOutcomeDoer_RebirthCultivation.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/JobDriver_LovinPatch.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/PatchOperationAdd_SettingDependent.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/PawnGenerator_GenerateInitialHediffsPatch_FactionCultivation.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SpecialThingFilterWorker_ItemGrade.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/StaticCollectionCached.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/StaticUIIconCached.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Thing_PostApplyDamage_BodyCultivator.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Thing_PostApplyDamage_QiDamage.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Thing_PreApplyDamage_WeaponGradeCheck.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ThoughtWorker_BodyCultivation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompItemGrade.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompItemGrade.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompPillGrade.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompPillGrade.cs" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;aranmaso&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/aranmaso/CultivatorOfTheRim-Source.git&quot;,
+    &quot;accountId&quot;: &quot;7b6f695f-0bda-42e0-9fdf-167b51fe46d4&quot;
+  }
+}</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/2020091ff557411995f6162babdf600547e00/af/ad63810e/02000019.il" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/26753f4392ff43a08380927e4f2d2a6b4de00/57/b8dac45f/02000076.il" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/4510f8b655984ab9867dda4b1e6c548e48a00/8e/4512b53c/02000040.il" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/5c578652bb08489c8e00b196ebdfd98850a00/26/d3ae6d72/0200008E.il" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/5c8229029c164d59b31e6cdbed4c6cdb48a00/14/cf20051a/02000040.il" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/5e3d8428233d4995b4c7b72b8512e8a548a00/df/ce1c59f1/02000040.il" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/672db404b97a45779bda0a900ca9ac5251000/28/9d83a75b/02000039.il" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/744091d990354b62a0c3e1907e23722848c00/22/8f035e5c/02000012.il" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/744091d990354b62a0c3e1907e23722848c00/60/51fcf32a/02000079.il" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/744091d990354b62a0c3e1907e23722848c00/7d/4e4650d8/02000042.il" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/ae17a105cdfe4cb68373a52ae0d7d7064c400/05/f2db1fd8/02000021.il" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/ca652d3411df4ff6bd4861059980576e4dc00/d5/3e396ec0/02000018.il" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/e4ab26ac288747e3b7150b8d1ff487d048a00/3b/57db8921/02000040.il" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/ef8dc3c23e924a19a51f96ceafc9ca024de00/c5/4644b723/02000027.il" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/f296132feb0e4170bdcf4994ea57cfc24c400/04/519e87bf/02000021.il" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/f296132feb0e4170bdcf4994ea57cfc24c400/0e/d447afe4/0200000C.il" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/fc6b186a4c9146b48ccd1b5c3b5519c347e00/76/03b26d4b/02000019.il" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/ILViewer/fc6b186a4c9146b48ccd1b5c3b5519c347e00/f3/87667dd6/0200004C.il" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/2465977aa5d94ef79e534c432288152117abd0/d5/13cf9331/Enumerable.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3789ee403a53437cbb6b5d9ab6311f51573620/f3/653ce927/List`1.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/02/a216af81/Pawn_HealthTracker.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/06/c5395cdf/ScattererValidator_AvoidThingsOfDef.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/08/69455443/Pawn.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/08/fca282b6/CompProperties_Usable.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/09/01ce5d96/ProjectileProperties.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/0a/abe992d1/Mod.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/0c/dbc56deb/CompUsable.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/0f/91f7baf8/HediffComp.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/14/16626812/ThingDefGenerator_Meat.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/18/19742d7d/ThingDef.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/18/5ba77387/Thought.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/1c/fb12923e/ThoughtMaker.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/1d/2bd8d242/HediffMaker.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/1f/d88d8b7b/Pawn_EquipmentTracker.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/20/326d3bde/GenDictionary.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/22/60864338/HediffStage.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/2d/cb496925/AttachableThing.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/2e/fb2144ae/GenGrid.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/35/d25bd14c/HediffCompProperties_GiveRandomSituationalThought.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/38/9280ef5c/ThingSetMakerUtility.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/3d/5a80d2c8/Projectile.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/55/54e577b1/CompProperties.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/58/7f7cb6f7/HediffWithComps.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/5d/4d9737d6/ResurrectionUtility.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/63/c4f15307/HediffDef.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/73/f8af2d5e/ModContentPack.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/7b/9e06b0c2/Hediff.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/7e/cd4c8ce1/GenCollection.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/85/306a5790/ThoughtDef.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/89/e8d6765b/Def.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/94/bf1bbd3c/Listing_Standard.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/9f/e0e49b97/GeneUtility.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/a0/ec6b4d11/GenList.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/b0/4f26911e/ContentFinder`1.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/b1/dc0f236a/Widgets.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/b4/7978749f/DamageDef.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/b7/8d60f109/ThoughtWorker_AlwaysActive.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/ba/a747d6a0/UniqueIDsManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/c3/9dc5e23a/GeneMaker.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/c3/b00e5ba1/HediffSet.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/cd/3e83a071/ThoughtWorker.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/de/b8f68659/ThoughtWorker_Affair.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/de/c310d516/MemoryThoughtHandler.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/df/e30b74be/Gender.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/e2/69b48886/GeneDef.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/e8/c8f1612d/HediffUtility.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/46372f5dadbf4af8939e608076251180f04e00/fc/c9c75881/ThingComp.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/aa6f91704fa644158c914b8d3de2653a19a00/1a/4bee05b3/TechLevelCostWorker.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/aa6f91704fa644158c914b8d3de2653a19a00/33/7eeee68d/ValueSplitWorker.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/aa6f91704fa644158c914b8d3de2653a19a00/3c/a5c77c36/TraitCostRuleDef.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/aa6f91704fa644158c914b8d3de2653a19a00/3d/a1457889/TraitCostRuleWorker.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/aa6f91704fa644158c914b8d3de2653a19a00/68/25db03f1/ComponentSwapOrSplitWorker.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/aa6f91704fa644158c914b8d3de2653a19a00/6b/e69044fa/TraitCostUtility.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/aa6f91704fa644158c914b8d3de2653a19a00/b9/e3d646f1/WorkbenchUtility.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/aa6f91704fa644158c914b8d3de2653a19a00/c5/dadb3de8/EmpSplitWorker.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/aa6f91704fa644158c914b8d3de2653a19a00/d3/22787e78/IncendiarySwapWorker.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/aa6f91704fa644158c914b8d3de2653a19a00/d5/f8d4b9c6/Dialog_WeaponCustomization.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/e422ced3d0f64bb29423e8338d57bc041528c0/50/22070100/Rect.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/e422ced3d0f64bb29423e8338d57bc041528c0/5b/3e7398b6/Color.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/e422ced3d0f64bb29423e8338d57bc041528c0/91/3533c7ff/ColorUtility.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/e422ced3d0f64bb29423e8338d57bc041528c0/ff/841c97d0/Mathf.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/metadata/46372f5dadbf4af8939e608076251180f04e00/87/be5bc5d2/Assembly-CSharp.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../../Cultivator of the Rim/Current/Defs/HediffDefs/CultivationRealm_Example.xml" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../../Cultivator of the Rim/Current/Defs/ThingDef_Items/Cultivation_Qi_Pills.xml" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../../Cultivator of the Rim/Current/Defs/ThingDef_Items/Genral_Pill.xml" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/BonusHediff.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/BreakThroughRealmInfo.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CompAbilityEffect_GiveHediffTechnique.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CompAbilityEffect_VoidTear.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CompAuctionHouse.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CompBeastCore.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CompProperties_AbilityEffectVoidTear.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CompProperties_EscapeTheDomain.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CompProperties_Formation.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CompProperties_UseEffectBeastCoreAbsorption.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CompProperties_UseEffectConsumeQiPill.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CompProperties_UseEffectPlaySound.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CompProperties_UseEffectRebirth.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CompUseEffect_BeastCoreAbsorption.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CompUseEffect_ConsumeQiPill.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CompUseEffect_PlaySound.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CompUseEffect_Rebirth.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CultivationHediffDef.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Cultivation_Utility.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CultivatorOfTheRimSetting.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/DebugToolsGeneral_CTR.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/FactionCultivationDef.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HediffCompProperties_BodyCultivation.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HediffCompProperties_CultivatorResurrect.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HediffComp_BodyCultivation.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HediffComp_Cultivation.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HediffComp_CultivatorResurrect.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HediffGiver_PillBacklash.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Hediff_CultivationBase.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/ITab_Cultivation.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/IngestionOutcomeDoer_RebirthCultivation.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/PawnGenerator_GenerateInitialHediffsPatch_FactionCultivation.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Properties/AssemblyInfo.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/SpecialThingFilterWorker_ItemGrade.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/StaticCollectionCached.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/StaticUIIconCached.cs" root0="SKIP_HIGHLIGHTING" />
+  </component>
+  <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="3Ch59JMnXRdsHxO2FC3Ss4Lvabi" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RiderProblemsViewState">
+    <hideBySeverity>
+      <option value="15" />
+      <option value="16" />
+      <option value="20" />
+    </hideBySeverity>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="5091c950-5cc1-4096-b7f8-b3473239172c" name="Changes" comment="" />
+      <created>1776824809834</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1776824809834</updated>
+      <workItem from="1776824811173" duration="353000" />
+      <workItem from="1776825186321" duration="1691000" />
+      <workItem from="1776827082109" duration="447000" />
+      <workItem from="1776827554225" duration="7546000" />
+      <workItem from="1776835673573" duration="53000" />
+      <workItem from="1776835864296" duration="192000" />
+      <workItem from="1776836346576" duration="40000" />
+      <workItem from="1776836430075" duration="290000" />
+      <workItem from="1776876544779" duration="446000" />
+      <workItem from="1776884763415" duration="35000" />
+      <workItem from="1776885109222" duration="428000" />
+      <workItem from="1776887078010" duration="468000" />
+      <workItem from="1776896176978" duration="69000" />
+      <workItem from="1776896270471" duration="62000" />
+      <workItem from="1776905249278" duration="27000" />
+      <workItem from="1776905498505" duration="700000" />
+      <workItem from="1776907034168" duration="556000" />
+      <workItem from="1776911953051" duration="29000" />
+      <workItem from="1776912069728" duration="24000" />
+      <workItem from="1776912179102" duration="8000" />
+      <workItem from="1776912376917" duration="4000" />
+      <workItem from="1776912438588" duration="10000" />
+      <workItem from="1776924342361" duration="3519000" />
+      <workItem from="1776969151420" duration="11713000" />
+      <workItem from="1776987072386" duration="715000" />
+      <workItem from="1777017423020" duration="6210000" />
+      <workItem from="1777034250451" duration="1234000" />
+      <workItem from="1777036212084" duration="3147000" />
+      <workItem from="1777045378823" duration="816000" />
+      <workItem from="1777063359642" duration="2038000" />
+      <workItem from="1777067471535" duration="765000" />
+      <workItem from="1777091310924" duration="5798000" />
+      <workItem from="1777097222902" duration="5928000" />
+      <workItem from="1777106074710" duration="4000" />
+      <workItem from="1777108161875" duration="2404000" />
+      <workItem from="1777130957030" duration="389000" />
+      <workItem from="1777175127636" duration="231000" />
+      <workItem from="1777175510100" duration="505000" />
+      <workItem from="1777209047844" duration="104000" />
+      <workItem from="1777209809882" duration="147000" />
+      <workItem from="1777211870865" duration="58000" />
+      <workItem from="1777221776552" duration="980000" />
+      <workItem from="1777281400881" duration="152000" />
+      <workItem from="1777291753749" duration="2783000" />
+      <workItem from="1777321445687" duration="44000" />
+      <workItem from="1777356060551" duration="1798000" />
+      <workItem from="1777371659592" duration="526000" />
+      <workItem from="1777379222824" duration="53000" />
+      <workItem from="1777383907881" duration="59000" />
+      <workItem from="1777383989507" duration="29000" />
+      <workItem from="1777393472556" duration="59000" />
+      <workItem from="1777398306712" duration="316000" />
+      <workItem from="1777448855400" duration="1746000" />
+      <workItem from="1777493933280" duration="31000" />
+      <workItem from="1777544714654" duration="795000" />
+      <workItem from="1777547515671" duration="47000" />
+      <workItem from="1777547617969" duration="3000" />
+      <workItem from="1777574803379" duration="2259000" />
+      <workItem from="1777591969176" duration="166000" />
+      <workItem from="1777594478919" duration="72000" />
+      <workItem from="1777719742096" duration="64000" />
+      <workItem from="1777840044653" duration="1767000" />
+      <workItem from="1777845721931" duration="2681000" />
+      <workItem from="1777848963679" duration="1781000" />
+      <workItem from="1777915654700" duration="775000" />
+      <workItem from="1777921234014" duration="1362000" />
+      <workItem from="1777927709671" duration="60000" />
+      <workItem from="1778039097479" duration="354000" />
+      <workItem from="1778041564160" duration="1135000" />
+      <workItem from="1778089131003" duration="808000" />
+      <workItem from="1778097293120" duration="38000" />
+      <workItem from="1778099606572" duration="20000" />
+      <workItem from="1778119665814" duration="2769000" />
+      <workItem from="1778277501288" duration="998000" />
+      <workItem from="1778373861186" duration="207000" />
+      <workItem from="1778374255696" duration="590000" />
+      <workItem from="1778446621485" duration="5405000" />
+      <workItem from="1778458539822" duration="712000" />
+      <workItem from="1778462166969" duration="683000" />
+      <workItem from="1778480892718" duration="222000" />
+      <workItem from="1778539315376" duration="64000" />
+      <workItem from="1778539407958" duration="86000" />
+      <workItem from="1778539513619" duration="315000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
+  <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
+  <component name="UnityProjectDiscoverer">
+    <option name="hasUnityReference" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
+          <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />
+          <option name="timeStamp" value="1" />
+        </breakpoint>
+        <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
+          <properties exception="System.Threading.Tasks.TaskCanceledException" breakIfHandledByOtherCode="false" displayValue="System.Threading.Tasks.TaskCanceledException" />
+          <option name="timeStamp" value="2" />
+        </breakpoint>
+        <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
+          <properties exception="System.Threading.ThreadAbortException" breakIfHandledByOtherCode="false" displayValue="System.Threading.ThreadAbortException" />
+          <option name="timeStamp" value="3" />
+        </breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>
