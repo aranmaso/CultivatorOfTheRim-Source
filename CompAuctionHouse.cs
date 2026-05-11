@@ -14,8 +14,6 @@ namespace CultivatorOfTheRim
     {
         public int coolDown = 900000;
 
-        public int tickSinceAuction = 0;
-
         public int nextAuctionDay;
 
         public int auctionDuration = 5000;
@@ -28,7 +26,7 @@ namespace CultivatorOfTheRim
 
         public List<ThingCategoryDef> thingCategoryDefChoice => Props.categoryChoice;
 
-        public ThingCategoryDef choosenCategoryDef = ThingCategoryDefOf.Weapons;
+        public ThingCategoryDef choosenCategoryDef = null;
 
         public string choosenCategoryDefString
         {
@@ -42,13 +40,13 @@ namespace CultivatorOfTheRim
             }
         }
 
-        public IEnumerable<int> raiseOption = new List<int>() { 10, 20, 50, 100, 200, 1000 };
+        public readonly IEnumerable<int> raiseOption = new List<int>() { 10, 20, 50, 100, 200, 1000 };
 
         public IEnumerable<ThingDef> paymentOption => Props.paymentOption;
 
         public ThingDef choosenPaymentOption = ThingDefOf.Silver;
 
-        public IDictionary<int, float> raiseChanceForRando = new Dictionary<int, float>()
+        public readonly IDictionary<int, float> raiseChanceForRando = new Dictionary<int, float>()
         {
             {100, 0.50f },
             {200, 0.40f },
@@ -59,7 +57,7 @@ namespace CultivatorOfTheRim
 
         public int choosenRaiseOption = 0;
 
-        public List<ThingDef> currentAuctionItemList = new List<ThingDef>();
+        public List<ThingDef> currentAuctionItemList = [];
 
         public Thing currentItemOnAuction;
 
@@ -78,18 +76,14 @@ namespace CultivatorOfTheRim
         public int tickUntilNextBidder = 250;
 
         public int tickSinceLastRandoBid = 0;
+        
         public Thing sellingItem;
 
         public CompProperties_AuctionHouse Props => (CompProperties_AuctionHouse)props;
         public override void PostPostMake()
         {
             base.PostPostMake();
-            if (tickSinceAuction <= 0)
-            {
-                //tickSinceAuction = Rand.Range(coolDown / 2, coolDown);
-                //nextAuctionDay = Find.TickManager.TicksGame + Rand.Range(coolDown / 2, coolDown);
-                nextAuctionDay = Find.TickManager.TicksGame + Props.tickTillNextAuction.RandomInRange;
-            }
+            nextAuctionDay = Find.TickManager.TicksGame + Props.tickTillNextAuction.RandomInRange;
         }
         public override void PostExposeData()
         {
@@ -129,18 +123,17 @@ namespace CultivatorOfTheRim
             }
         }
 
-        public override void CompTick()
+        public override void CompTickInterval(int delta)
         {
-            base.CompTick();
-            /*if (tickSinceAuction > 0)
-            {
-                tickSinceAuction--;
-            }*/
+            base.CompTickInterval(delta);
             if (Find.TickManager.TicksGame >= nextAuctionDay && !auctionInProgress)
             {
                 StartAuctionEvent();
-            }
-
+            }            
+        }
+        public override void CompTick()
+        {
+            base.CompTick();            
             if (itemAuctionTimer > 0)
             {
                 tickSinceLastRandoBid++;
@@ -227,7 +220,10 @@ namespace CultivatorOfTheRim
                 }
                 else if (!currentAuctionItemList.NullOrEmpty())
                 {
-                    currentItemOnAuction.Destroy();
+                    if (!currentItemOnAuction.DestroyedOrNull())
+                    {
+                        currentItemOnAuction.Destroy();
+                    }
                     GetNewAuctionItem();
                 }
                 else if (currentAuctionItemList.NullOrEmpty() && isLastItem)
@@ -414,17 +410,17 @@ namespace CultivatorOfTheRim
                 raiseBid.defaultDesc = "raise bid by: " + choosenRaiseOption;
                 if (isBonusItem && isLastItem)
                 {
-                    raiseBid.icon = ContentFinder<Texture2D>.Get(Props.uiIcon);
+                    raiseBid.icon = Props.uiIconTexture;
                 }
                 else
                 {
                     if (currentItemOnAuction is Pawn)
                     {
-                        raiseBid.icon = Widgets.GetIconFor((Pawn)currentItemOnAuction, currentItemOnAuction.DrawSize, Rot4.South, true, out var scale, out var angle, out var IconProp, out var color);
+                        raiseBid.icon = Widgets.GetIconFor((Pawn)currentItemOnAuction, currentItemOnAuction.DrawSize, Rot4.South, true, out var scale, out var angle, out var IconProp, out var color,out var material);
                     }
                     else
                     {
-                        raiseBid.icon = currentItemOnAuction != null ? Widgets.GetIconFor(currentItemOnAuction.def) : ContentFinder<Texture2D>.Get(Props.uiIcon);
+                        raiseBid.icon = currentItemOnAuction != null ? Widgets.GetIconFor(currentItemOnAuction.def) : Props.uiIconTexture;
                     }
 
                 }
@@ -466,7 +462,7 @@ namespace CultivatorOfTheRim
                 {
                     chooseBidder.defaultLabel = "Bidder: " + choosenBidder;
                 }
-                chooseBidder.icon = ContentFinder<Texture2D>.Get(Props.uiIcon);
+                chooseBidder.icon = Props.uiIconTexture;
                 chooseBidder.action = delegate
                 {
                     List<FloatMenuOption> choice = new List<FloatMenuOption>();
@@ -525,7 +521,7 @@ namespace CultivatorOfTheRim
                 Command_Action giveup = new Command_Action();
                 giveup.defaultLabel = "give up current Item";
                 giveup.defaultDesc = "give up current Item";
-                giveup.icon = ContentFinder<Texture2D>.Get(Props.uiIconGiveup);
+                giveup.icon = Props.uiIconGiveupTexture;
                 giveup.action = delegate
                 {
                     if (isYourItem)
@@ -554,7 +550,7 @@ namespace CultivatorOfTheRim
                 Command_Action startNowPayCost = new Command_Action();
                 startNowPayCost.defaultLabel = "pay 2500 spirit stone to start Auction";
                 startNowPayCost.defaultDesc = "by paying 2500 spirit stone to start auction now";
-                startNowPayCost.icon = ContentFinder<Texture2D>.Get(Props.uiIcon);
+                startNowPayCost.icon = Props.uiIconTexture;
                 startNowPayCost.action = delegate
                 {
                     if (ColonyHasEnoughMoney(CTR_DefOf.CTR_SpiritStone, parent.Map, 2500))
@@ -572,7 +568,7 @@ namespace CultivatorOfTheRim
                 Command_Action chooseCategory = new Command_Action();
                 chooseCategory.defaultLabel = "Category: " + choosenCategoryDefString;
                 //chooseCategory.defaultDesc = "Category: " + "none";
-                chooseCategory.icon = ContentFinder<Texture2D>.Get(Props.uiIcon); ;
+                chooseCategory.icon = Props.uiIconTexture;
                 chooseCategory.action = delegate
                 {
                     List<FloatMenuOption> choice = new List<FloatMenuOption>();
@@ -595,7 +591,7 @@ namespace CultivatorOfTheRim
                 {
                     defaultLabel = "Sell Item",
                     defaultDesc = "Put your item on auction",
-                    icon = ContentFinder<Texture2D>.Get(Props.uiIcon),
+                    icon = Props.uiIconTexture,
                     action = delegate
                     {
                         Find.Targeter.BeginTargeting(GetTargetingParameters(), delegate (LocalTargetInfo t)
@@ -695,7 +691,7 @@ namespace CultivatorOfTheRim
                     {
                         defaultLabel = "Eject Content",
                         defaultDesc = "eject current colony item that was put on auction",
-                        icon = ContentFinder<Texture2D>.Get("UI/Designators/Cancel"),
+                        icon = Props.uiIconCancel,
                         action = delegate
                         {
                             GenPlace.TryPlaceThing(sellingItem, parent.Position.RandomAdjacentCell8Way(), parent.Map, ThingPlaceMode.Near);
@@ -714,7 +710,7 @@ namespace CultivatorOfTheRim
                     sellingPawnToggle.defaultLabel = "Non-Pawn Selling Mode";
                     sellingPawnToggle.defaultDesc = "colony is no longer auctioning away prisoner or slave";
                 }
-                sellingPawnToggle.icon = ContentFinder<Texture2D>.Get(Props.uiIcon);
+                sellingPawnToggle.icon = Props.uiIconTexture;
                 sellingPawnToggle.isActive = () => isSellingPawn;
                 sellingPawnToggle.toggleAction = delegate
                 {
@@ -730,7 +726,6 @@ namespace CultivatorOfTheRim
                     defaultLabel = "start auction now",
                     action = delegate
                     {
-                        tickSinceAuction = 60;
                         nextAuctionDay = Find.TickManager.TicksGame + 60;
                     }
                 };
@@ -805,7 +800,7 @@ namespace CultivatorOfTheRim
                 {
                     return false;
                 }
-                if (thingDef.tradeTags != null && thingDef.tradeTags.Any((string tag) => tag.Contains("CE") && tag.Contains("Ammo")))
+                if (thingDef.tradeTags != null && thingDef.tradeTags.Any((string tag) => tag == "CE" || tag == "Ammo"))
                 {
                     return false;
                 }
@@ -872,7 +867,7 @@ namespace CultivatorOfTheRim
                 {
                     return false;
                 }
-                if (thingDef.tradeTags != null && thingDef.tradeTags.Any((string tag) => tag.Contains("CE") && tag.Contains("Ammo")))
+                if (thingDef.tradeTags != null && thingDef.tradeTags.Any((string tag) => tag == "CE" || tag == "Ammo"))
                 {
                     return false;
                 }
@@ -1090,7 +1085,7 @@ namespace CultivatorOfTheRim
             }*/
             if (dropSpot != parent.Position)
             {
-                ActiveDropPodInfo activeDropPodInfo = new ActiveDropPodInfo();
+                ActiveTransporterInfo activeDropPodInfo = new ActiveTransporterInfo();
                 activeDropPodInfo.SingleContainedThing = newThing;
                 activeDropPodInfo.leaveSlag = false;
                 DropPodUtility.MakeDropPodAt(dropSpot, map, activeDropPodInfo);

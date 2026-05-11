@@ -12,7 +12,7 @@ namespace CultivatorOfTheRim
         {
             if(pawn.IsHashIntervalTick(tickInterval))
             {
-                Hediff_CultivationLevel level = Cultivation_Utility.FindCultivationLevel(pawn);
+                Hediff level = Cultivation_Utility.FindCultivationLevel(pawn);
                 if(level != null)
                 {
                     level.Severity += severityAmount.RandomInRange * pawn.GetStatValue(CTR_DefOf.CultivationSpeed);

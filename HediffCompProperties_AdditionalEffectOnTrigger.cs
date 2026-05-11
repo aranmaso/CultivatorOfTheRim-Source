@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using Verse;
 
 namespace CultivatorOfTheRim
@@ -49,15 +50,38 @@ namespace CultivatorOfTheRim
         public bool hasUiIcon;
 
         /*[MayRequire("zomuro.itssorcery")]
-        public SorcerySchemaDef sorcerySchemaDef;
+        public 
+        sorcerySchemaDef;
 
         public StatDef energyStat;
 
         public float energyCost;*/
 
+        public Texture2D icon;
+
         public HediffCompProperties_AdditionalEffectOnTrigger()
         {
             compClass = typeof(HediffComp_AdditionalEffectOnTrigger);
+        }
+
+        public override IEnumerable<string> ConfigErrors(HediffDef parentDef)
+        {
+            if (hasUiIcon && uiIcon == null)
+            {
+                yield return "uiIcon property is null";
+            }
+        }
+
+        public override void ResolveReferences(HediffDef parent)
+        {
+            base.ResolveReferences(parent);
+            if (hasUiIcon)
+            {
+                LongEventHandler.ExecuteWhenFinished(delegate
+                { 
+                    icon = ContentFinder<Texture2D>.Get(uiIcon);
+                });
+            }
         }
     }
 }

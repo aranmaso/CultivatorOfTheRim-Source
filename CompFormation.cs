@@ -51,7 +51,63 @@ namespace CultivatorOfTheRim
             Scribe_Values.Look(ref activationDelay, "activationDelay", 0);
             Scribe_Values.Look(ref isFormationActive, "isFormationActive", false);
         }
-        public override void CompTick()
+        public override void CompTickInterval(int delta)
+        {
+            base.CompTickInterval(delta);
+            if (activationDelay > 0)
+            {
+                activationDelay--;
+                if (activationDelay <= 0)
+                {
+                    if (durationLeft <= 0)
+                    {
+                        isFormationActive = false;
+                    }
+                }
+                return;
+            }
+            else
+            {
+                if (isFormationActive)
+                {
+                    if (durationLeft > 0)
+                    {
+                        durationLeft--;
+                    }
+                    else
+                    {
+                        isFormationActive = false;
+                    }
+                }
+            }
+            int num = (isFormationActive ? 1 : 0);
+            if (parent.overrideGraphicIndex != num)
+            {
+                parent.overrideGraphicIndex = num;
+                parent.DirtyMapMesh(parent.Map);
+                Glower?.UpdateLit(parent.Map);
+                Glower.glowOnInt = isFormationActive;
+            }
+            if (isFormationActive && durationLeft > 0)
+            {
+                if (parent.IsHashIntervalTick(Props.checkInterval,delta))
+                {
+                    if (Props.heddiffDef != null)
+                    {
+                        GiveHediff();
+                    }
+                    if (Props.isShootingProjectile)
+                    {
+                        ShootProjectile();
+                    }
+                    if (Props.isSpeedUpPlant)
+                    {
+                        SpeedUpPlant();
+                    }
+                }
+            }
+        }
+        /*public override void CompTick()
         {
             if(activationDelay > 0)
             {
@@ -106,7 +162,7 @@ namespace CultivatorOfTheRim
                 }
             }
             
-        }
+        }*/
         public void SpeedUpPlant()
         {
             if (Props.isPlayingEffector)
@@ -122,6 +178,7 @@ namespace CultivatorOfTheRim
                 }
                 if(item is Plant plant)
                 {
+                    if (plant.LifeStage == PlantLifeStage.Sowing) continue;
                     if (plant.Growth < 1f)
                     {
                         plant.Growth += Props.speedUpPercent.RandomInRange;
@@ -258,7 +315,7 @@ namespace CultivatorOfTheRim
                 {
                     defaultLabel = "Absorb Spirit Stone",
                     defaultDesc = "Absorb Qi from spirit stone",
-                    icon = ContentFinder<Texture2D>.Get(Props.uiIcon) ?? Widgets.GetIconFor(parent.def),
+                    icon = Props._uiIcon ?? Widgets.GetIconFor(parent.def),
                     hotKey = KeyBindingDefOf.Command_ItemForbid,
                     action = delegate
                     {
@@ -333,7 +390,7 @@ namespace CultivatorOfTheRim
                 formationToggle.defaultLabel = "Start Formation";
                 formationToggle.defaultDesc = "formation is currently deactivated";
             }
-            formationToggle.icon = ContentFinder<Texture2D>.Get(Props.uiIcon) ?? Widgets.GetIconFor(parent.def);
+            formationToggle.icon = Props._uiIcon ?? Widgets.GetIconFor(parent.def);
             formationToggle.hotKey = KeyBindingDefOf.Designator_RotateRight;
             formationToggle.action = delegate
             {

@@ -15,7 +15,7 @@ namespace CultivatorOfTheRim
 
         public string ownerName;
 
-        public HediffDef ownerCultivation;
+        public CultivationHediffDef ownerCultivation;
 
         public override void PostExposeData()
         {
@@ -29,9 +29,24 @@ namespace CultivatorOfTheRim
             base.PostPostMake();
             if(ownerDef == null)
             {
-                ownerDef = DefDatabase<ThingDef>.AllDefs.Where(PawnPredicate).RandomElement();
-                ownerName = ownerDef.LabelCap;
-                ownerCultivation = Cultivation_Utility.realmListAll.RandomElement().Key;
+                if (parent.def == CTR_DefOf.CTR_BeastCore)
+                {
+                    ownerDef = DefDatabase<ThingDef>.AllDefs.Where(PawnPredicate).RandomElement();
+                    ownerName = ownerDef.LabelCap;
+                    ownerCultivation = StaticCollectionCached.CultivationHediffDefs.Where(x => !x.IsBodyCultivation() && x.realmPower <= 17).RandomElement();
+                }
+                else if (parent.def == CTR_DefOf.CTR_GoldenCore_Core)
+                {
+                    ownerDef = DefDatabase<ThingDef>.AllDefs.Where(PawnPredicate).RandomElement();
+                    ownerName = ownerDef.LabelCap;
+                    ownerCultivation = StaticCollectionCached.CultivationHediffDefs.Where(x => !x.IsBodyCultivation() && x.realmPower >= 7 && x.realmPower < 14).RandomElement();
+                }
+                else if (parent.def == CTR_DefOf.CTR_ImmortalCore)
+                {
+                    ownerDef = DefDatabase<ThingDef>.AllDefs.Where(PawnPredicate).RandomElement();
+                    ownerName = ownerDef.LabelCap;
+                    ownerCultivation = StaticCollectionCached.CultivationHediffDefs.Where(x => !x.IsBodyCultivation() && x.realmPower >= 14 && x.realmPower <= 17).RandomElement();
+                }
             }
         }
         public bool PawnPredicate(ThingDef def)
@@ -67,8 +82,8 @@ namespace CultivatorOfTheRim
             StringBuilder stringBuilder = new StringBuilder();
             if (ownerCultivation != null)
             {
-                stringBuilder.AppendLine("beast: " + ownerDef.label + "(" + ownerName + ")");
-                stringBuilder.AppendLine("beast cultivation: " + ownerCultivation.LabelCap);
+                stringBuilder.AppendLine("owner: " + ownerDef.label + "(" + ownerName + ")");
+                stringBuilder.AppendLine("owner cultivation: " + ownerCultivation.LabelCap);
             }
             return stringBuilder.ToString().TrimEndNewlines();
         }

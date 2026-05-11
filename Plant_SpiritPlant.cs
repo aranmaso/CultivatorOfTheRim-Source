@@ -36,24 +36,12 @@ namespace CultivatorOfTheRim
             {
                 if (pawnsNearby != null)
                 {
-                    return pawnsNearby.First().Key;
+                    return pawnsNearby.OrderBy(x => x.Value).First().Key;
                 }
                 return null;
             }
         }
         public bool isDayTime => GenLocalDate.DayPercent(Map) >= 0.25f && GenLocalDate.DayPercent(Map) <= 0.75f;
-        /*public bool isDayTime
-        {
-            get
-            { 
-             if(GenLocalDate.DayPercent(curMap) >= 0.25f && GenLocalDate.DayPercent(curMap) <= 0.75f)
-             {
-                return true;
-             }
-             return false;
-            }
-        }*/
-
         public int dayOfMonth => GenLocalDate.DayOfQuadrum(Map);
         public int dayOfYear => GenLocalDate.DayOfYear(Map);
 
@@ -95,7 +83,7 @@ namespace CultivatorOfTheRim
                 {
                     return 0f;
                 }
-                if (base.Spawned && !PlantUtility.GrowthSeasonNow(base.Position, base.Map) && !modExtension.ignoreTemp)
+                if (base.Spawned && !PlantUtility.GrowthSeasonNow(Position,Map,def) && !modExtension.ignoreTemp)
                 {
                     return 0f;
                 }
@@ -230,28 +218,49 @@ namespace CultivatorOfTheRim
 
         public override void TickLong()
         {
-            base.TickLong();      
-            if(this.IsHashIntervalTick(1))
+            base.TickLong();
+            if (modExtension.requireSource)
             {
-                if (modExtension.requireSource)
-                {
-                    RequireSource();
-                }
-                if(modExtension.requireSpecialSource)
-                {
-                    RequireSpecialSource();
-                }
-                if (modExtension.speedUpNearbyPlant)
-                {
-                    SpeedUpPlantGrow();
-                }
-                if(modExtension.isStopGrowingIfThingInRange)
-                {
-                    PreventGrowthIfForbiddenInRange();
-                }
-            }                        
+                RequireSource();
+            }
+            if (modExtension.requireSpecialSource)
+            {
+                RequireSpecialSource();
+            }
+            if (modExtension.speedUpNearbyPlant)
+            {
+                SpeedUpPlantGrow();
+            }
+            if (modExtension.isStopGrowingIfThingInRange)
+            {
+                PreventGrowthIfForbiddenInRange();
+            }
         }
-        public override void Tick()
+        public override void Destroy(DestroyMode mode = DestroyMode.Vanish)
+        {
+            base.Destroy(mode);
+            if (!thingNearby.NullOrEmpty())
+            {
+                thingNearby.Clear();
+            }
+            if(!thingNearbyWithCurMul.NullOrEmpty())
+            {
+                thingNearbyWithCurMul.Clear();
+            }
+            if(!specialThingNearby.NullOrEmpty())
+            {
+                specialThingNearby.Clear();
+            }
+            if(!forbiddenThingNearby.NullOrEmpty())
+            {
+                forbiddenThingNearby.Clear();
+            }
+            if(!pawnsNearby.EnumerableNullOrEmpty())
+            {
+                pawnsNearby.Clear();
+            }
+        }
+        protected override void Tick()
         {
             base.Tick(); 
             if(modExtension.isAffectByPawnApproaching)
@@ -403,24 +412,20 @@ namespace CultivatorOfTheRim
         public void PreventGrowthIfForbiddenInRange()
         {
             //clear thing out of range or null
-            IReadOnlyList<Thing> list = new List<Thing>(forbiddenThingNearby);
+            /*IReadOnlyList<Thing> list = new List<Thing>(forbiddenThingNearby);
             for (int i = 0; i < list.Count; i++)
             {
                 if (forbiddenThingNearby[i].DestroyedOrNull() || forbiddenThingNearby[i].Position.DistanceToSquared(Position) > (modExtension.radius * modExtension.radius))
                 {
                     forbiddenThingNearby.Remove(forbiddenThingNearby[i]);
                 }
-            }
-
+            }*/
             //update item
             if (Map == null)
             {
                 return;
             }
-            if (Position == null)
-            {
-                return;
-            }
+            forbiddenThingNearby.Clear();
             foreach (var item in GenRadial.RadialDistinctThingsAround(Position, Map, modExtension.forbiddenRange, false))
             {
                 if (forbiddenThingNearby.Contains(item))
@@ -448,23 +453,35 @@ namespace CultivatorOfTheRim
             //clear thing out of range or null
             if(!specialThingNearby.NullOrEmpty())
             {
-                IReadOnlyList<Thing> list = new List<Thing>(specialThingNearby);
-                for (int i = 0; i < list.Count; i++)
+                try
                 {
-                    if (specialThingNearby[i].DestroyedOrNull() || specialThingNearby[i].Position.DistanceToSquared(Position) > (modExtension.radius * modExtension.radius))
+                    IReadOnlyList<Thing> list = new List<Thing>(specialThingNearby);
+                    foreach (var item in list)
                     {
-                        specialThingNearby.Remove(specialThingNearby[i]);
+                        try
+                        {
+                            if (!specialThingNearby.Contains(item)) continue;
+                            if (item.DestroyedOrNull() || item.Position.DistanceToSquared(Position) > (modExtension.radius * modExtension.radius))
+                            {
+                                specialThingNearby.Remove(item);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Error($"[CultivatorOfTheRim] Error ticking RequireSpecialSource for {LabelShort}. iterating item: {item}. {ex}");
+                        }
                     }
+                }
+                catch(Exception ex)
+                {
+                    Log.Error($"[CultivatorOfTheRim] Error ticking RequireSpecialSource for {LabelShort}. {ex}");
+
                 }
             }
             
 
             //update item
             if (Map == null)
-            {
-                return;
-            }
-            if (Position == null)
             {
                 return;
             }
@@ -492,7 +509,11 @@ namespace CultivatorOfTheRim
         {
             if (HitPoints < MaxHitPoints)
             {
-                HitPoints++;
+                HitPoints += Rand.RangeInclusive(1,10);
+                if (HitPoints > MaxHitPoints)
+                {
+                    HitPoints = MaxHitPoints;
+                }
             }
         }
         public void RequireSource()
@@ -507,73 +528,73 @@ namespace CultivatorOfTheRim
                 //Log.Message("get list count: " + thingNearbyCount);
                 IReadOnlyList<Thing> tempList = new List<Thing>(thingNearby);
                 float num = modExtension.radius * modExtension.radius;
-                for (int i = 0; i < tempList.Count - 1; i++)
+                for (var i = 0; i < tempList.Count; i++)
                 {
-                    if (thingNearby[i].DestroyedOrNull())
+                    var item = tempList[i];
+                    try
                     {
-                        //Log.Message("is null " + thingNearby[i].LabelShort);
-                        //Log.Message("null pos: " + thingNearby[i].Position);
-                        //numberOfSource--;
-                        //Log.Message("numsource--");
-                        if(!thingNearbyWithCurMul.NullOrEmpty())
+                        if (item == null || !item.Spawned || item.Destroyed)
                         {
-                            //Log.Message("thingNearbyCurMulNotEmpty");
-                            if (thingNearbyWithCurMul.Keys.Contains(thingNearby[i]))
+                            if (!thingNearbyWithCurMul.NullOrEmpty())
                             {
-                                //Log.Message("curListContain " + thingNearby[i]);
-                                curMul -= thingNearbyWithCurMul[thingNearby[i]];
-                                //Log.Message("curMul -= " + thingNearbyWithCurMul[thingNearby[i]]);
-                                thingNearbyWithCurMul.Remove(thingNearby[i]);
-                                //Log.Message("remove from curMul list");
-                            }   
+                                if (thingNearbyWithCurMul.Keys.Contains(item))
+                                {
+                                    curMul -= thingNearbyWithCurMul[item];
+                                    thingNearbyWithCurMul.Remove(item);
+                                }
+                            }
+
+                            thingNearby.Remove(item);
                         }
-                        
-                        thingNearby.Remove(thingNearby[i]);
-                        //Log.Message("remove from nearby list");
-                    }                    
-                    else if (thingNearby[i].Position.DistanceToSquared(Position) > (modExtension.radius * modExtension.radius))
-                    {
-                        //Log.Message("thing got moved away");
-                        //numberOfSource--;
-                        if (thingNearbyWithCurMul.Keys.Contains(thingNearby[i]))
+                        else if (item.Position.DistanceToSquared(Position) >
+                                 (modExtension.radius * modExtension.radius))
                         {
-                            if (thingNearbyWithCurMul.Keys.Contains(thingNearby[i]))
+                            if (thingNearbyWithCurMul.Keys.Contains(item))
                             {
-                                curMul -= thingNearbyWithCurMul[thingNearby[i]];
-                                thingNearbyWithCurMul.Remove(thingNearby[i]);
+                                if (thingNearbyWithCurMul.Keys.Contains(item))
+                                {
+                                    curMul -= thingNearbyWithCurMul[item];
+                                    thingNearbyWithCurMul.Remove(item);
+                                }
+                            }
+
+                            //Log.Message("remove from Nearby list(too far away)");
+                            thingNearby.Remove(item);
+                        }
+                        else
+                        {
+                            if (modExtension.consumeSource)
+                            {
+                                if (item.DestroyedOrNull()) continue;
+                                if (!item.def.tradeTags.NullOrEmpty() &&
+                                    item.def.tradeTags.Contains("Unlimited_Source")) continue;
+                                DoDamageToSource(item);
                             }
                         }
-                        //Log.Message("remove from Nearby list(too far away)");
-                        thingNearby.Remove(thingNearby[i]);
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        if (modExtension.consumeSource)
-                        {
-                            if (!thingNearby[i].DestroyedOrNull() && !thingNearby[i].def.tradeTags.Contains("Unlimited_Source"))
-                            {
-                                DoDamageToSource(thingNearby[i]);
-                            }                            
-                        }
-
+                        Log.Error($"[CultivatorOfTheRim] Error checking for nearby thing{this}({PositionHeld}). {ex}");
                     }
-                }   
+                }
             }            
             if (!thingNearbyWithCurMul.NullOrEmpty())
             {
-                List<Thing> tempList = new List<Thing>(thingNearbyWithCurMul.Keys);
-                for (int i = 0; i < tempList.Count - 1; i++)
+                IReadOnlyList<Thing> tempList = new List<Thing>(thingNearbyWithCurMul.Keys);
+                for (var i = 0; i < tempList.Count; i++)
                 {
-                    if (tempList[i].DestroyedOrNull())
+                    var item = tempList[i];
+                    if (item.DestroyedOrNull())
                     {
-                        curMul -= thingNearbyWithCurMul[tempList[i]];
-                        thingNearbyWithCurMul.Remove(tempList[i]);
+                        curMul -= thingNearbyWithCurMul[item];
+                        thingNearbyWithCurMul.Remove(item);
                     }
+
                     float num2 = modExtension.radius * modExtension.radius;
-                    if (tempList[i].Position.DistanceToSquared(Position) > (modExtension.radius * modExtension.radius))
+                    if (item.Position.DistanceToSquared(Position) > (modExtension.radius * modExtension.radius))
                     {
-                        curMul -= thingNearbyWithCurMul[tempList[i]];
-                        thingNearbyWithCurMul.Remove(tempList[i]);
+                        curMul -= thingNearbyWithCurMul[item];
+                        thingNearbyWithCurMul.Remove(item);
                     }
                 }
             }
@@ -586,24 +607,26 @@ namespace CultivatorOfTheRim
             {
                 return;
             }
-            if(Position == null)
+
+            List<Thing> tempNearby = [.. GenRadial.RadialDistinctThingsAround(Position, Map, modExtension.radius, true)];
+            for (var i = 0; i < tempNearby.Count; i++)
             {
-                return;
-            }    
-            foreach (var item in GenRadial.RadialDistinctThingsAround(Position, Map, modExtension.radius, true))
-            {
+                var item = tempNearby[i];
+                if(item.DestroyedOrNull()) continue;
                 if (thingNearby.Contains(item))
                 {
                     continue;
                 }
-                if(item == this || item.def == def)
+
+                /*if(item == this || item.def == def)
+                {
+                    continue;
+                }*/
+                if (!modExtension.excludedThing.NullOrEmpty() && modExtension.excludedThing.Contains(item.def))
                 {
                     continue;
                 }
-                if(!modExtension.excludedThing.NullOrEmpty() && modExtension.excludedThing.Contains(item.def))
-                {
-                    continue;
-                }                
+
                 if (!item.def.tradeTags.NullOrEmpty())
                 {
                     if (item.def.tradeTags.Any(x => modExtension.allowedTags.Contains(x)))
@@ -612,34 +635,28 @@ namespace CultivatorOfTheRim
                         thingNearby.Add(item);
                     }
                 }
-                /*if (itemGrade == null && !item.def.tradeTags.NullOrEmpty() && item.def.tradeTags.Any(x => modExtension.allowedTags.Contains(x)))
-                {
-                    float num = 0f;
-                    if(modExtension.allowedTags.Any(x => item.def.tradeTags.Contains(x)))
-                    {
-                        string text = Cultivation_Utility.qiSourceMultiplier.Keys.Where(x =>  modExtension.allowedTags.Contains(x)).FirstOrDefault();
-                        num = Cultivation_Utility.getQiSouceMultiplierForPlant(text);
-                    }
-                    curMul += num;
-                    numberOfSource++;
-                    thingNearby.Add(item);
-                }*/
                 else continue;
             }
-            foreach(var item in GenRadial.RadialDistinctThingsAround(Position,Map,modExtension.radius,true))
+
+            for (var i = 0; i < tempNearby.Count; i++)
             {
-                if(thingNearbyWithCurMul.ContainsKey(item))
+                var item = tempNearby[i];
+                if(item.DestroyedOrNull()) continue;
+                if (thingNearbyWithCurMul.ContainsKey(item))
                 {
                     continue;
                 }
+
                 if (item == this || item.def == def)
                 {
                     continue;
                 }
+
                 if (!modExtension.excludedThing.NullOrEmpty() && modExtension.excludedThing.Contains(item.def))
                 {
                     continue;
                 }
+
                 CompItemGrade itemGrade = item.TryGetComp<CompItemGrade>();
                 if (itemGrade != null)
                 {
@@ -655,14 +672,12 @@ namespace CultivatorOfTheRim
                                 break;
                             }
                         }
-                        /*if(num > curMul)
-                        {
-                            curMul = num;
-                        }*/                        
-                        if(!thingNearby.Contains(item))
+
+                        if (!thingNearby.Contains(item))
                         {
                             thingNearby.Add(item);
                         }
+
                         if (!thingNearbyWithCurMul.Keys.Contains(item))
                         {
                             thingNearbyWithCurMul.SetOrAdd(item, num);
@@ -671,8 +686,8 @@ namespace CultivatorOfTheRim
                         //numberOfSource++;
                     }
                 }
-
             }
+
             numberOfSource = thingNearby.Count();
             if (numberOfSource <= 0)
             {
@@ -683,39 +698,65 @@ namespace CultivatorOfTheRim
                         thingNearby.Clear();
                     }
                 }
-                TakeDamage(new DamageInfo(DamageDefOf.Deterioration, 5));
+                if(!Destroyed || this == null)
+                {
+                    HitPoints -= 5;
+                    if (HitPoints <= 0)
+                    {
+                        Destroy();
+                    }
+                    //TakeDamage(new DamageInfo(DamageDefOf.Deterioration, 5));
+                }
+                
             }
         }
         public void DoDamageToSource(Thing thing)
         {
             float num = 0f;
             FleckDef fleckDef = null;
-            foreach (var item in thing.def.tradeTags)
+            if (!thing.def.tradeTags.NullOrEmpty())
             {
-                num = Cultivation_Utility.getItemQiValueForPawn(item);
-                fleckDef = Cultivation_Utility.getQiTypeFleck(item);
-                if (num > 0f)
+                foreach (var item in thing.def.tradeTags)
                 {
-                    break;
+                    num = Cultivation_Utility.getItemQiValueForPawn(item);
+                    fleckDef = Cultivation_Utility.getQiTypeFleck(item);
+                    if (num > 0f)
+                    {
+                        break;
+                    }
                 }
+            }
+            else
+            {
+                num = 0.01f;
+                fleckDef = CTR_DefOf.CTR_AbsorbQiOrbPure;
             }
             num *= 2f;
             Cultivation_Utility.ThrowObjectAt(Map, thing.DrawPos, DrawPos, fleckDef ?? CTR_DefOf.CTR_AbsorbQiOrbPure, 0.25f + num, 0.25f + num);
+            if (!CultivatorOfTheRimMod.settings.isSpiritPlantDamageSource) return;
+
             if (modExtension.destroyOnConsume)
             {
                 thing?.Destroy();
             }
-            else if (thing.def.useHitPoints && !thing.def.tradeTags.Contains("Unlimited_Source"))
-            {                                
+            else if (thing.def.useHitPoints)
+            {
+                if (!thing.def.tradeTags.NullOrEmpty() && thing.def.tradeTags.Contains("Unlimited_Source"))
+                {
+                    return;
+                }
                 if (thing.stackCount <= 1)
                 {
-                    thing.TakeDamage(new DamageInfo(DamageDefOf.Deterioration, modExtension.sourceDamagePerTrigger));
+                    thing.HitPoints -= modExtension.sourceDamagePerTrigger;
+                    if (thing.HitPoints <= 0) thing.Destroy();
+                    //thing.TakeDamage(new DamageInfo(DamageDefOf.Deterioration, modExtension.sourceDamagePerTrigger));
                 }
                 else if (thing.stackCount > 1)
                 {
                     if (thing.HitPoints - modExtension.sourceDamagePerTrigger >= 1)
                     {
-                        thing.TakeDamage(new DamageInfo(DamageDefOf.Deterioration, modExtension.sourceDamagePerTrigger));
+                        thing.HitPoints -= modExtension.sourceDamagePerTrigger;
+                        //thing.TakeDamage(new DamageInfo(DamageDefOf.Deterioration, modExtension.sourceDamagePerTrigger));
                         if(thing.HitPoints <= thing.MaxHitPoints * 0.01f)
                         {
                             thing.stackCount--;
@@ -744,8 +785,10 @@ namespace CultivatorOfTheRim
             isSimilarPlantNearby = isNearbySimilarPlant;
             if (modExtension.onlyWorkIfNoPlantOfSameTypeInRange)
             {
-                foreach (var item in GenRadial.RadialDistinctThingsAround(Position, Map, modExtension.radius, false))
+                IReadOnlyList<Thing> tempLists = GenRadial.RadialDistinctThingsAround(Position, Map, modExtension.radius, false).ToList();
+                foreach (var item in tempLists)
                 {
+                    if (item.DestroyedOrNull()) continue;
                     if(item is not Plant_SpiritPlant)
                     {
                         continue;
@@ -770,60 +813,81 @@ namespace CultivatorOfTheRim
             {
                 return;
             }
-            if (Position == null)
+            IReadOnlyList<Thing> tempThings = GenRadial.RadialDistinctThingsAround(Position, Map, modExtension.radius, false).ToList();
+            foreach (var item in tempThings)
             {
-                return;
-            }
-            foreach (var item in GenRadial.RadialDistinctThingsAround(Position, Map, modExtension.radius, false))
-            {
-                if (item == this)
+                try
                 {
-                    continue;
-                }
-                if(item.def == def)
-                {
-                    continue;
-                }
-                /*if(!GenSight.LineOfSightToThing(Position,item,Map))
-                {
-                    continue;
-                }*/
-                if(modExtension.disallowedDef.Contains(item.def))
-                {
-                    continue;
-                }
-                if(modExtension.onlyAffectSpiritPlant && item is not Plant_SpiritPlant)
-                {
-                    continue;
-                }    
-                if(modExtension.onlyAffectCommonPlant && item is Plant_SpiritPlant)
-                {
-                    continue;
-                }
-                if (item is Plant plant)
-                {
-                    if (plant.Growth < 1f)
+                    if (item == this)
                     {
-                        plant.Growth += modExtension.growthBoost.RandomInRange;
-                        TakeDamage(dinfo);
-                        SpawnQiOrb(item.DrawPos);
+                        continue;
+                    }
+                    if (item.def == def)
+                    {
+                        continue;
+                    }
+                    if (item == null)
+                    {
+                        continue;
+                    }
+                    /*if(!GenSight.LineOfSightToThing(Position,item,Map))
+                    {
+                        continue;
+                    }*/
+                    if (modExtension.disallowedDef.Contains(item.def))
+                    {
+                        continue;
+                    }
+                    if (modExtension.onlyAffectSpiritPlant && item is not Plant_SpiritPlant)
+                    {
+                        continue;
+                    }
+                    if (modExtension.onlyAffectCommonPlant && item is Plant_SpiritPlant)
+                    {
+                        continue;
+                    }
+                    if (item is Plant plant)
+                    {
+                        if (plant.LifeStage != PlantLifeStage.Sowing && plant.Growth < 1f)
+                        {
+                            plant.Growth += modExtension.growthBoost.RandomInRange;
+                            HitPoints--;
+                            //TakeDamage(dinfo);
+                            SpawnQiOrb(item.DrawPos);
+                            if (HitPoints <= 0)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    else if (item is Plant_SpiritPlant spiritPlant)
+                    {
+                        if (spiritPlant.LifeStage != PlantLifeStage.Sowing && spiritPlant.Growth < 1f)
+                        {
+                            spiritPlant.Growth += modExtension.growthBoost.RandomInRange;
+                            HitPoints--;
+                            //TakeDamage(dinfo);
+                            SpawnQiOrb(item.DrawPos);
+                            if (HitPoints <= 0)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        continue;
                     }
                 }
-                else if (item is Plant_SpiritPlant spiritPlant)
+                catch(Exception ex)
                 {
-                    if (spiritPlant.Growth < 1f)
-                    {
-                        spiritPlant.Growth += modExtension.growthBoost.RandomInRange;
-                        TakeDamage(dinfo);
-                        SpawnQiOrb(item.DrawPos);
-                    }
-                }
-                else
-                {
-                    continue;
+                    Log.Error($"[CultivatorOfTheRim]. {this} failed to speed up growth for {item}. {ex}");
                 }
             }
-
+            if (HitPoints <= 0)
+            {
+                Destroy();
+            }
         }
 
         public void SpawnQiOrb(Vector3 target)
@@ -977,7 +1041,7 @@ namespace CultivatorOfTheRim
 
                         if (GrowthRateFactor_Temperature < 0.99f && !modExtension.ignoreTemp)
                         {
-                            if (Mathf.Approximately(GrowthRateFactor_Temperature, 0f) || !PlantUtility.GrowthSeasonNow(base.Position, base.Map))
+                            if (Mathf.Approximately(GrowthRateFactor_Temperature, 0f) || !PlantUtility.GrowthSeasonNow(Position, Map, def))
                             {
                                 stringBuilder.AppendLine("OutOfIdealTemperatureRangeNotGrowing".Translate());
                             }

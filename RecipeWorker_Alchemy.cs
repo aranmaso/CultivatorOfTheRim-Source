@@ -12,6 +12,10 @@ namespace CultivatorOfTheRim
         private RecipeExtension_Alchemy modExtension => recipe.GetModExtension<RecipeExtension_Alchemy>();
 
         private bool passRequirement = false;
+
+        public Bill Bill = null;
+
+
         /*public override void ConsumeIngredient(Thing ingredient, RecipeDef recipe, Map map)
         {
             Pawn billdoer = null;            
@@ -63,7 +67,7 @@ namespace CultivatorOfTheRim
         public override void Notify_IterationCompleted(Pawn billDoer, List<Thing> ingredients)
         {
             base.Notify_IterationCompleted(billDoer, ingredients);
-            Hediff_CultivationLevel level = Cultivation_Utility.FindCultivationLevel(billDoer);
+            Hediff_CultivationBase level = billDoer.FindAnyCultivationLevel();
             if (level != null)
             {
                 if (modExtension.allowedCultivationLevel.Any(x => level.def.tags.Contains(x)))
@@ -77,11 +81,15 @@ namespace CultivatorOfTheRim
             }
             if (passRequirement)
             {
-                if(Rand.Value < billDoer.GetStatValue(CTR_DefOf.AlchemySuccessChance) * recipe.recipeUsers.FirstOrDefault().GetStatValueAbstract(CTR_DefOf.AlchemyFurnaceQuality))
+                Thing workbench = GenRadial.RadialDistinctThingsAround(billDoer.Position,billDoer.MapHeld,2f,true).
+                    Where(x => x.def == CTR_DefOf.CTR_AlchemyFurnace_Basic || x.def == CTR_DefOf.CTR_AlchemyFurnace_Intermediate).FirstOrDefault();
+                float furnaceQuality = workbench != null ? workbench.GetStatValue(CTR_DefOf.AlchemyFurnaceQuality) : 0f;
+                float chance = billDoer.GetStatValue(CTR_DefOf.AlchemySuccessChance) * furnaceQuality;
+                if (Rand.Chance(chance))
                 {
                     Thing newThing = ThingMaker.MakeThing(modExtension.successfulProduct ?? recipe.ProducedThingDef);
                     bool flag = billDoer.InspirationDef == InspirationDefOf.Inspired_Creativity;
-                    float count = DoAlchemyAmountResult(Cultivation_Utility.realmListAll[level.def], modExtension.count.min, modExtension.count.max, flag);
+                    float count = DoAlchemyAmountResult(StaticCollectionCached.CultivationRealmPower[level.def], modExtension.count.min, modExtension.count.max, flag);
                     newThing.stackCount = Mathf.FloorToInt(count);
                     GenPlace.TryPlaceThing(newThing, billDoer.Position, billDoer.Map, ThingPlaceMode.Near);
                     Messages.Message("pill making success, " + billDoer.LabelShort + " has successfully making " + modExtension.successfulProduct.label + " with cultivation of " + level.def.label + " " + level.CurStage.label + " " + billDoer.LabelShort + " has made " + count + " of " + modExtension.successfulProduct.label, MessageTypeDefOf.NeutralEvent);
@@ -99,7 +107,8 @@ namespace CultivatorOfTheRim
                     }
                     else
                     {
-                        Messages.Message(billDoer.LabelCap + " has sufficient cultivation but failed in doing alchemy due to insufficient skill", MessageTypeDefOf.NeutralEvent);
+                        Messages.Message($"mixing failed,{billDoer.LabelShort} has sufficient cultivation but didn't pass success check. {chance.ToStringPercent("0.00")}", MessageTypeDefOf.NeutralEvent);
+                        //Messages.Message(billDoer.LabelCap + " has sufficient cultivation but failed in doing alchemy due to insufficient skill", MessageTypeDefOf.NeutralEvent);
                     }
                     
                 }

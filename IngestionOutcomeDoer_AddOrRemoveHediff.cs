@@ -11,6 +11,12 @@ namespace CultivatorOfTheRim
         public HediffDef hediffDef;
 
         public HediffDef hediffDefToRemove;
+        
+        public HediffDef specialHediffDef;
+
+        public Gender genderRequirement;
+
+        public BodyPartDef part;
 
         public float baseDuration;
 
@@ -51,24 +57,56 @@ namespace CultivatorOfTheRim
                 {
                     Hediff hediff = Cultivation_Utility.GetFirstHediffOfDef(pawn, hediffDef);
                     hediff.Severity += severity.RandomInRange * num;
-                    baseDuration *= num;
+                    float duration = baseDuration;
+                    duration *= num;
                     if (hediff.TryGetComp<HediffComp_Disappears>() != null)
                     {
-                        hediff.TryGetComp<HediffComp_Disappears>().ticksToDisappear = Mathf.FloorToInt(baseDuration);
-                    }
+                        hediff.TryGetComp<HediffComp_Disappears>().ticksToDisappear = Mathf.FloorToInt(duration);
+                    }                    
                 }
                 else
                 {
                     Hediff hediff = HediffMaker.MakeHediff(hediffDef, pawn);
-                    hediff.Severity = severity.RandomInRange * num;                    
-                    baseDuration *= num;
+                    hediff.Severity = severity.RandomInRange * num;
+                    float duration = baseDuration;
+                    duration *= num;
                     if (hediff.TryGetComp<HediffComp_Disappears>() != null)
                     {
-                        hediff.TryGetComp<HediffComp_Disappears>().ticksToDisappear = Mathf.FloorToInt(baseDuration);
+                        hediff.TryGetComp<HediffComp_Disappears>().ticksToDisappear = Mathf.FloorToInt(duration);
                     }
                     pawn.health.AddHediff(hediff);
                 }
-                
+            }
+
+            if (specialHediffDef != null)
+            {
+                if (pawn.gender == genderRequirement)
+                {
+                    if(pawn.health.hediffSet.HasHediff(specialHediffDef))
+                    {
+                        Hediff hediff = Cultivation_Utility.GetFirstHediffOfDef(pawn, specialHediffDef);
+                        hediff.Severity += severity.RandomInRange * num;
+                        float duration = baseDuration;
+                        duration *= num;
+                        if (hediff.TryGetComp<HediffComp_Disappears>() != null)
+                        {
+                            hediff.TryGetComp<HediffComp_Disappears>().ticksToDisappear = Mathf.FloorToInt(duration);
+                        }                    
+                    }
+                    else
+                    {
+                        BodyPartRecord br = pawn.health.hediffSet.GetBodyPartRecord(part ?? CTR_DefOf.Pelvis);
+                        Hediff hediff = HediffMaker.MakeHediff(specialHediffDef, pawn,br);
+                        hediff.Severity = severity.RandomInRange * num;
+                        float duration = baseDuration;
+                        duration *= num;
+                        if (hediff.TryGetComp<HediffComp_Disappears>() != null)
+                        {
+                            hediff.TryGetComp<HediffComp_Disappears>().ticksToDisappear = Mathf.FloorToInt(duration);
+                        }
+                        pawn.health.AddHediff(hediff,br);
+                    }
+                }
             }
             if(hediffDefToRemove != null)
             {

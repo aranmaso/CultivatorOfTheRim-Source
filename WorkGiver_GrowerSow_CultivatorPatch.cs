@@ -31,7 +31,7 @@ namespace CultivatorOfTheRim
                             }
                             else
                             {
-                                Hediff pawnCultivation = Cultivation_Utility.FindCultivationLevel(pawn);
+                                Hediff pawnCultivation = pawn.FindAnyCultivationLevel();
                                 if(!pawnCultivation.def.tags.Contains(requireTag))
                                 {
                                     return false;

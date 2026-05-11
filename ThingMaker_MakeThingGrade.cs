@@ -121,7 +121,7 @@ namespace CultivatorOfTheRim
     [HarmonyPatch("PostProcessProduct")]
     public class GenRecipe_MakeThingGrade
     {
-        private static void Postfix(ref Thing __result,ref Thing product,ref RecipeDef recipeDef,ref Pawn worker,Precept_ThingStyle precept = null, ThingStyleDef style = null, int? overrideGraphicIndex = null)
+        public static void Postfix(ref Thing __result,ref Thing product,ref RecipeDef recipeDef,ref Pawn worker,Precept_ThingStyle precept = null, ThingStyleDef style = null, int? overrideGraphicIndex = null)
         {
             CompItemGrade compItemGrade = __result.TryGetComp<CompItemGrade>();
             if (compItemGrade != null) 

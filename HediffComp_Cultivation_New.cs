@@ -11,7 +11,7 @@ using HarmonyLib;
 
 namespace CultivatorOfTheRim
 {
-    public class HediffComp_Cultivation_New : HediffComp
+    /*public class HediffComp_Cultivation_New : HediffComp
     {
         private HediffCompProperties_Cultivation Props => (HediffCompProperties_Cultivation)props;
 
@@ -41,7 +41,7 @@ namespace CultivatorOfTheRim
             {
                 if (requireQiSource)
                 {
-                    int value = Cultivation_Utility.realmListAll[Def];
+                    int value = Def.GetModExtension<DefModExtension_RealmRankingPower>().realmPower;
                     if (value >= 7)
                     {
                         return true;
@@ -57,7 +57,7 @@ namespace CultivatorOfTheRim
         {
             get
             {
-                return Cultivation_Utility.realmListAll[Def];
+                return Def.GetModExtension<DefModExtension_RealmRankingPower>().realmPower;
             }
         }
 
@@ -754,5 +754,5 @@ namespace CultivatorOfTheRim
                 Pawn.jobs.TryTakeOrderedJob(job, JobTag.Misc);
             }
         }
-    }
+    }*/
 }

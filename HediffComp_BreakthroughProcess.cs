@@ -35,15 +35,15 @@ namespace CultivatorOfTheRim
             //base.CompPostPostRemoved();
             if(CultivatorOfTheRimMod.settings.isBreakthroughCanFailForHumanlike)
             {
-                float chance = Cultivation_Utility.GetBreakthroughChance(Pawn,nextLevel);
+                float chance = Cultivation_Utility.GetBreakthroughChance(Pawn,false);
                 
-                if (Rand.Value <= chance)
+                if (Rand.Chance(chance) || Pawn.HaveBodyCultivation())
                 {
                     string text = "Breakingthrough!";
                     string text2 = Pawn.LabelShort + " " + "has breakthrough from " + curLevel.LabelCap + " to " + nextLevel.LabelCap;
                     Find.LetterStack.ReceiveLetter(text, text2, LetterDefOf.PositiveEvent, parent.pawn);
 
-                    Pawn.health.RemoveHediff(Pawn.health.hediffSet.GetFirstHediffOfDef(curLevel));
+                    Pawn.health.RemoveHediff(Pawn.health.hediffSet.hediffs.FirstOrDefault(x => x.def == curLevel && x.Severity == x.def.maxSeverity));
                     Pawn.health.AddHediff(nextLevel);
 
                     if (Pawn.Map != null)

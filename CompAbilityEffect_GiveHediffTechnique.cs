@@ -26,10 +26,7 @@ namespace CultivatorOfTheRim
                         Hediff hediff = target.Pawn.health.hediffSet.GetFirstHediffOfDef(Props.hediffDef);
                         hediff.Severity = Props.penaltySeverity;
                         HediffComp_Disappears hdd = hediff.TryGetComp<HediffComp_Disappears>();
-                        if (hdd != null)
-                        {
-                            hdd.ticksToDisappear = Props.duration;
-                        }                        
+                        hdd?.ticksToDisappear = Props.duration;
                     }
                     else
                     {

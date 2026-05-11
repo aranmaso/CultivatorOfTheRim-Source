@@ -5,7 +5,7 @@ using Verse;
 
 namespace CultivatorOfTheRim
 {
-    [HarmonyPatch(typeof(Pawn))]
+    /*[HarmonyPatch(typeof(Pawn))]
     [HarmonyPatch("PreApplyDamage")]
     public class Pawn_PreApplyDamage_QiDamage
     {
@@ -14,7 +14,7 @@ namespace CultivatorOfTheRim
             new CurvePoint(1,0.10f),
             new CurvePoint(19, 0.20f),
         };
-        private static void Postfix(ref DamageInfo dinfo, ref bool absorbed, Pawn __instance)
+        public static void Postfix(ref DamageInfo dinfo, ref bool absorbed, Pawn __instance)
         {            
             if(dinfo.Instigator is Pawn attacker)
             {
@@ -31,16 +31,16 @@ namespace CultivatorOfTheRim
                     return;
                 }
                 if (attacker.RaceProps.IsMechanoid) return;
-                if (!Cultivation_Utility.HaveCultivation(attacker))
+                if (!attacker.HaveCultivation())
                 {
                     return;
                 }
-                Hediff attackCulLevel = Cultivation_Utility.FindCultivationLevel(attacker);
+                Hediff_CultivationLevel attackCulLevel = attacker.FindCultivationLevel();
                 if (attackCulLevel == null)
                 {
                     return;
                 }
-                int num = Cultivation_Utility.realmListAll[attackCulLevel.def];
+                int num = attackCulLevel.cultivationDef.realmPower;
                 if (num > 3)
                 {
                     //float rand = Rand.Range(0.01f, 1.25f);
@@ -56,5 +56,5 @@ namespace CultivatorOfTheRim
             }
             
         }
-    }
+    }*/
 }

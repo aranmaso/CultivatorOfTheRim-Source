@@ -1,5 +1,6 @@
 ﻿using RimWorld;
 using System.Collections.Generic;
+using UnityEngine;
 using Verse;
 
 namespace CultivatorOfTheRim
@@ -31,9 +32,24 @@ namespace CultivatorOfTheRim
         public float chanceFour = 0.1f;
 
         public float chanceFive = 0.05f;
+        
+        public Texture2D uiIconTexture;
+        public Texture2D uiIconGiveupTexture;
+        public Texture2D uiIconCancel;
         public CompProperties_AuctionHouse()
         {
             compClass = typeof(CompAuctionHouse);
+        }
+
+        public override void ResolveReferences(ThingDef parentDef)
+        {
+            base.ResolveReferences(parentDef);
+            LongEventHandler.ExecuteWhenFinished(delegate
+            {
+                uiIconTexture = ContentFinder<Texture2D>.Get(uiIcon);
+                uiIconGiveupTexture = ContentFinder<Texture2D>.Get(uiIconGiveup);
+                uiIconCancel = ContentFinder<Texture2D>.Get("UI/Designators/Cancel");
+            });
         }
     }
 }

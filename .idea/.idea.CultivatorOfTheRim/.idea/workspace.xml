@@ -10,57 +10,52 @@
     <configurations />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5091c950-5cc1-4096-b7f8-b3473239172c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.CultivatorOfTheRim/.idea/indexLayout.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.CultivatorOfTheRim/.idea/projectSettingsUpdater.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.CultivatorOfTheRim/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.CultivatorOfTheRim/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BonusHediff.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BreakThroughRealmInfo.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CTR_SuperStartPatch.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompAbilityEffect_VoidTear.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompProperties_AbilityEffectVoidTear.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompProperties_UseEffectBeastCoreAbsorption.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompProperties_UseEffectConsumeGenericPill.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompProperties_UseEffectConsumeQiPill.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompProperties_UseEffectPlaySound.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompProperties_UseEffectRebirth.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompUseEffect_BeastCoreAbsorption.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompUseEffect_ConsumeGenericPill.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompUseEffect_ConsumeQiPill.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompUseEffect_PlaySound.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompUseEffect_Rebirth.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CultivationHediffDef.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CultivationHediffStage.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Cultivation_AttachableThing.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/DebugToolsGeneral_CTR.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/DefModExtension_RealmRankingPower.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FactionCultivationDef.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GameComponent_CultivatorCacheManager.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HediffCompProperties_BodyCultivation.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HediffCompProperties_CultivatorResurrect.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HediffCompProperties_GiveAbilityCultivator.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HediffComp_BodyCultivation.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HediffComp_CultivatorResurrect.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HediffComp_GiveAbilityCultivator.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HediffStageData.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Hediff_BodyCultivaton.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Hediff_CultivationBase.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Hediff_DynamicStage.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ITab_Cultivation.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/IngestionOutcomeDoer_RebirthCultivation.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/JobDriver_LovinPatch.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/PatchOperationAdd_SettingDependent.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/PawnGenerator_GenerateInitialHediffsPatch_FactionCultivation.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SpecialThingFilterWorker_ItemGrade.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/StaticCollectionCached.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/StaticUIIconCached.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Thing_PostApplyDamage_BodyCultivator.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Thing_PostApplyDamage_QiDamage.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Thing_PreApplyDamage_WeaponGradeCheck.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ThoughtWorker_BodyCultivation.cs" afterDir="false" />
+    <list default="true" id="5091c950-5cc1-4096-b7f8-b3473239172c" name="Changes" comment="assss">
+      <change afterPath="$PROJECT_DIR$/HediffComp_AbsorbingPill.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.CultivatorOfTheRim/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.CultivatorOfTheRim/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CTR_DefOf.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CTR_DefOf.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CTR_StartPatch.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CTR_StartPatch.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompAbilityEffect_GiveHediffTechnique.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompAbilityEffect_GiveHediffTechnique.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompAuctionHouse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompAuctionHouse.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompBeastCore.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompBeastCore.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompFormation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompFormation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompGetNearbyPawn.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompGetNearbyPawn.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CompItemGrade.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompItemGrade.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CompPillGrade.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompPillGrade.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompProperties_AuctionHouse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompProperties_AuctionHouse.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompProperties_Formation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompProperties_Formation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CompUseEffect_EscapeTheDomain.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CompUseEffect_EscapeTheDomain.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cultivation_Utility.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Cultivation_Utility.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CultivatorOfTheRim.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/CultivatorOfTheRim.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CultivatorOfTheRimSetting.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CultivatorOfTheRimSetting.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DefGenerator_GenerateImpliedDefs_PreResolve_Patch.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DefGenerator_GenerateImpliedDefs_PreResolve_Patch.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HediffCompProperties_AdditionalEffectOnTrigger.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HediffCompProperties_AdditionalEffectOnTrigger.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HediffCompProperties_Cultivation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HediffCompProperties_Cultivation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HediffComp_AdditionalEffectOnTrigger.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HediffComp_AdditionalEffectOnTrigger.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HediffComp_BreakthroughProcess.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HediffComp_BreakthroughProcess.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HediffComp_Cultivation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HediffComp_Cultivation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HediffComp_Cultivation_New.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HediffComp_Cultivation_New.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HediffGiver_AbsorbingPill.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HediffGiver_AbsorbingPill.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Hediff_AbsorbingPill.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Hediff_CultivationLevel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Hediff_CultivationLevel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IngestionOutcomeDoer_AddOrRemoveHediff.cs" beforeDir="false" afterPath="$PROJECT_DIR$/IngestionOutcomeDoer_AddOrRemoveHediff.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IngestionOutcomeDoer_BeastCoreAbsorption.cs" beforeDir="false" afterPath="$PROJECT_DIR$/IngestionOutcomeDoer_BeastCoreAbsorption.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IngestionOutcomeDoer_GiveQi.cs" beforeDir="false" afterPath="$PROJECT_DIR$/IngestionOutcomeDoer_GiveQi.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pawn_PreApplyDamage_ArmorGradeCheck.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Pawn_PreApplyDamage_ArmorGradeCheck.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pawn_PreApplyDamage_CultivatorCheck.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Pawn_PreApplyDamage_CultivatorCheck.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pawn_PreApplyDamage_DantianDamage.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Pawn_PreApplyDamage_DantianDamage.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pawn_PreApplyDamage_QiDamage.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Pawn_PreApplyDamage_QiDamage.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Plant_SpiritPlant.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Plant_SpiritPlant.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Projectile_QiAttack.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Projectile_QiAttack.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Projectile_QiExplosion.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Projectile_QiExplosion.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RecipeExtension_MixingIngredient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RecipeExtension_MixingIngredient.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RecipeWorker_Alchemy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RecipeWorker_Alchemy.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RecipeWorker_MixingIngredient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/RecipeWorker_MixingIngredient.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScenPart_ForcedCultivation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ScenPart_ForcedCultivation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/StatPart_BeastCore.cs" beforeDir="false" afterPath="$PROJECT_DIR$/StatPart_BeastCore.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ThingMaker_MakeThingGrade.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ThingMaker_MakeThingGrade.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WeatherEvent_LightningStrikeGiveSpiritItemPatch.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WeatherEvent_LightningStrikeGiveSpiritItemPatch.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WorkGiver_GrowerSow_CultivatorPatch.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WorkGiver_GrowerSow_CultivatorPatch.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,6 +64,7 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -168,13 +164,13 @@
     <setting file="file://$PROJECT_DIR$/../../../Cultivator of the Rim/Current/Defs/HediffDefs/CultivationRealm_Example.xml" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../../Cultivator of the Rim/Current/Defs/ThingDef_Items/Cultivation_Qi_Pills.xml" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../../Cultivator of the Rim/Current/Defs/ThingDef_Items/Genral_Pill.xml" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/BonusHediff.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/BreakThroughRealmInfo.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/BonusHediff.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/BreakThroughRealmInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/CompAbilityEffect_GiveHediffTechnique.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/CompAbilityEffect_VoidTear.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CompAbilityEffect_VoidTear.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/CompAuctionHouse.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/CompBeastCore.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/CompProperties_AbilityEffectVoidTear.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CompProperties_AbilityEffectVoidTear.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/CompProperties_EscapeTheDomain.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/CompProperties_Formation.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/CompProperties_UseEffectBeastCoreAbsorption.cs" root0="FORCE_HIGHLIGHTING" />
@@ -182,28 +178,30 @@
     <setting file="file://$PROJECT_DIR$/CompProperties_UseEffectPlaySound.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/CompProperties_UseEffectRebirth.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/CompUseEffect_BeastCoreAbsorption.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/CompUseEffect_ConsumeQiPill.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CompUseEffect_ConsumeQiPill.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/CompUseEffect_PlaySound.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/CompUseEffect_Rebirth.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/CultivationHediffDef.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CompUseEffect_Rebirth.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CultivationHediffDef.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Cultivation_Utility.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/CultivatorOfTheRimSetting.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/DebugToolsGeneral_CTR.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/FactionCultivationDef.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/HediffCompProperties_BodyCultivation.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/HediffCompProperties_CultivatorResurrect.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/HediffComp_BodyCultivation.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HediffCompProperties_BodyCultivation.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HediffCompProperties_CultivatorResurrect.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HediffComp_AbsorbingPill.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HediffComp_BodyCultivation.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HediffComp_Cultivation.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/HediffComp_CultivatorResurrect.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HediffComp_CultivatorResurrect.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HediffGiver_PillBacklash.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Hediff_CultivationBase.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/ITab_Cultivation.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/IngestionOutcomeDoer_RebirthCultivation.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/PawnGenerator_GenerateInitialHediffsPatch_FactionCultivation.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Hediff_CultivationBase.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Hediff_CultivationLevel.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/ITab_Cultivation.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/IngestionOutcomeDoer_RebirthCultivation.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/PawnGenerator_GenerateInitialHediffsPatch_FactionCultivation.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Properties/AssemblyInfo.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/SpecialThingFilterWorker_ItemGrade.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/StaticCollectionCached.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/StaticUIIconCached.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/StaticCollectionCached.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/StaticUIIconCached.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
@@ -334,8 +332,19 @@
       <workItem from="1778480892718" duration="222000" />
       <workItem from="1778539315376" duration="64000" />
       <workItem from="1778539407958" duration="86000" />
-      <workItem from="1778539513619" duration="315000" />
+      <workItem from="1778539513619" duration="397000" />
+      <workItem from="1778539940782" duration="1211000" />
+      <workItem from="1778541186510" duration="424000" />
     </task>
+    <task id="LOCAL-00001" summary="assss">
+      <option name="closed" value="true" />
+      <created>1778539834690</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1778539834690</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -348,6 +357,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="assss" />
+    <option name="LAST_COMMIT_MESSAGE" value="assss" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

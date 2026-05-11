@@ -28,16 +28,16 @@ namespace CultivatorOfTheRim
                 CompBeastCore comp = req.Thing.TryGetComp<CompBeastCore>();
                 if(comp != null)
                 {
-                    HediffDef hediff = null;
+                    CultivationHediffDef hediff = null;
                     if (comp.ownerCultivation != null)
                     {
-                        hediff = comp.ownerCultivation;
+                        hediff = (CultivationHediffDef)comp.ownerCultivation;
                     }
                     else
                     {
-                        hediff = CTR_DefOf.CTR_BodyTempering;
+                        hediff = (CultivationHediffDef)CTR_DefOf.CTR_BodyTempering;
                     }
-                    int num = Cultivation_Utility.realmListAll[hediff];
+                    int num = hediff.realmPower;
                     float num2 = curveValue.Evaluate(num);
                     val *= num2;
                 }

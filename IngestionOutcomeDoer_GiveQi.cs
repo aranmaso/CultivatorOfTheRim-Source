@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using RimWorld;
+using System.Collections.Generic;
 using System.Linq;
-using RimWorld;
+using UnityEngine;
 using Verse;
 
 namespace CultivatorOfTheRim
@@ -16,29 +17,60 @@ namespace CultivatorOfTheRim
 		public HediffDef backlashHediffDef;
 		public bool notForMortal = false;
 		public bool lethalForMortal = false;
+        public bool allowBodyCultivator = false;
+        public bool onlyBodyCultivator = false;
 		public float Hediffchance = 1f;
-
-		/*public SimpleCurve curves = new SimpleCurve() {
-			new CurvePoint(1,1),
-			new CurvePoint(2,2),
-			new CurvePoint(2,2),
-			new CurvePoint(2,2),
-			new CurvePoint(2,2),
-			new CurvePoint(2,2),
-			new CurvePoint(2,2),
-		};*/
 		
-
-		public bool cultivationTooLow = false;
-		protected override void DoIngestionOutcomeSpecial(Pawn pawn, Thing ingested, int ingestedCount)
+        public PillGrade pillGrade = PillGrade.Spirit;        
+        protected override void DoIngestionOutcomeSpecial(Pawn pawn, Thing ingested, int ingestedCount)
         {
-			Hediff_CultivationLevel level = Cultivation_Utility.FindCultivationLevel(pawn);				
+            Hediff level = null;
+            if (allowBodyCultivator)
+            {
+                if (onlyBodyCultivator)
+                {
+                    level = pawn.FindBodyCultivationLevel();
+                }
+                else
+                {
+                    level = pawn.FindAnyCultivationLevel();
+                }
+            }
+            else
+            {
+                level = pawn.FindCultivationLevel();
+            }
+
 			if(level != null)
             {
-
                 if (!minimumCultivationLevel.NullOrEmpty() && minimumCultivationLevel.Any(x => level.def.tags.Contains(x)))
                 {
-					cultivationTooLow = false;
+                    ingested.TryGetPillGrade(out var gc);
+                    float num = 1f;
+                    switch (gc)
+                    {
+                        case PillGrade.Spirit:
+                            num = 1f;
+                            break;
+                        case PillGrade.Earth:
+                            num = 1.1f;
+                            break;
+                        case PillGrade.Heaven:
+                            num = 1.2f;
+                            break;
+                        case PillGrade.Mysterious:
+                            num = 1.3f;
+                            break;
+                        case PillGrade.Divine:
+                            num = 1.4f;
+                            break;
+                        case PillGrade.Emperor:
+                            num = 1.5f;
+                            break;
+                        default:
+                            num = 1f;
+                            break;
+                    }
 					float effect = severity.RandomInRange;
 					effect /= pawn.BodySize;
 					level.Severity += effect;
@@ -46,18 +78,22 @@ namespace CultivatorOfTheRim
 					{
                         Hediff hediff = HediffMaker.MakeHediff(hediffDef, pawn);
                         hediff.Severity = 0.001f;
-						ingested.TryGetPillGrade(out var gc);
                         hediff.TryGetComp<HediffComp_AbsorbingPill>().pillGrade = gc;
+                        if (hediff.TryGetComp<HediffComp_Disappears>() != null)
+                        {
+                            int duration = hediff.TryGetComp<HediffComp_Disappears>().ticksToDisappear;
+                            duration = Mathf.RoundToInt(duration * num);
+                            hediff.TryGetComp<HediffComp_Disappears>().ticksToDisappear = duration;
+                        }
                         pawn.health.AddHediff(hediff);
                     }					
 
 				}
 				else
                 {
-					cultivationTooLow = true;
-					if(backlashHediffDef != null && Rand.Value < 0.75f)
+					if(backlashHediffDef != null && Rand.Chance(0.75f))
                     {
-                        Messages.Message(pawn.LabelShort + " cultivation level too low, there might be some backlash from consuming pill far beyond current level", MessageTypeDefOf.NeutralEvent);
+                        Messages.Message(pawn.LabelShort + " cultivation level too low, there might be some backlash from consuming pill far beyond current level", MessageTypeDefOf.NegativeEvent);
                         Backlash(pawn);
 					}										
 				}
@@ -77,17 +113,41 @@ namespace CultivatorOfTheRim
                         pawn.health.AddHediff(hediff);
                     }                    
                 }				
-				else if(Rand.Value <= Hediffchance)
-				{
-                    Hediff hediff = Cultivation_Utility.CreateHediffNoDuration(pawn, CTR_DefOf.CTR_BodyTempering);
-                    hediff.Severity = 0.001f;
-                    pawn.health.AddHediff(hediff);
-					if(ingested.def == CTR_DefOf.CTR_TribulationRemnantPill)
+				else if(Rand.Chance(Hediffchance))
+				{                    
+					if(ingested.def == CTR_DefOf.CTR_TribulationRemnantPill || ingested.def == CTR_DefOf.CTR_QiCondensingPill)
 					{
-                        pawn.Map.weatherManager.eventHandler.AddEvent(new WeatherEvent_LightningStrikeTribulation(pawn.Map, pawn.Position, 0, 5));
-                        string text = "Become Cultivator!";
-                        string text2 = pawn.LabelShort + " " + "has consume a heavenly tribulation remnant and step onto the path of cultivation!";
-                        Find.LetterStack.ReceiveLetter(text, text2, LetterDefOf.PositiveEvent);
+                        if (!pawn.HaveBodyCultivation())
+                        {
+                            Hediff hediff = Cultivation_Utility.CreateHediffNoDuration(pawn, CTR_DefOf.CTR_BodyTempering);
+                            hediff.Severity = 0.001f;
+                            pawn.health.AddHediff(hediff);
+                            pawn.Map.weatherManager.eventHandler.AddEvent(new WeatherEvent_LightningStrikeTribulation(pawn.Map, pawn.Position, 0, 5));
+                            string text = "Become Cultivator!";
+                            string text2 = pawn.LabelShort + " " + "has consume a spirit item and step onto the path of cultivation!";
+                            Find.LetterStack.ReceiveLetter(text, text2, LetterDefOf.PositiveEvent);
+                        }
+                        else
+                        {
+                            Messages.Message(pawn.LabelShort + " is already a body cultivator", MessageTypeDefOf.NegativeEvent);
+                        }
+                    }
+                    if (ingested.def == CTR_DefOf.CTR_BodyTemperingPill)
+                    {
+                        if (!pawn.HaveCultivation())
+                        {
+                            Hediff hediff = Cultivation_Utility.CreateHediffNoDuration(pawn, CTR_DefOf.CTR_MartialApprentice);
+                            hediff.Severity = 0.001f;
+                            pawn.health.AddHediff(hediff);
+                            pawn.Map.weatherManager.eventHandler.AddEvent(new WeatherEvent_LightningStrikeTribulation(pawn.Map, pawn.Position, 0, 5));
+                            string text = "Become Body Cultivator!";
+                            string text2 = pawn.LabelShort + " " + "has consume a body tempering pill and step onto the path of body cultivation!";
+                            Find.LetterStack.ReceiveLetter(text, text2, LetterDefOf.PositiveEvent);
+                        }
+                        else
+                        {
+                            Messages.Message(pawn.LabelShort + " is already a qi cultivator", MessageTypeDefOf.NegativeEvent);
+                        }
                     }
                 }                
             }
@@ -95,9 +155,16 @@ namespace CultivatorOfTheRim
 
 		public void Backlash(Pawn pawn)
         {
-			Hediff hediff = HediffMaker.MakeHediff(backlashHediffDef, pawn);
-			hediff.Severity = 0.001f;
-			pawn.health.AddHediff(hediff);
+			if (pawn.health.hediffSet.HasHediff(backlashHediffDef))
+			{
+				pawn.health.hediffSet.GetFirstHediffOfDef(backlashHediffDef).Severity += severity.RandomInRange;
+			}
+			else
+			{
+                Hediff hediff = HediffMaker.MakeHediff(backlashHediffDef, pawn);
+                hediff.Severity = severity.RandomInRange;
+                pawn.health.AddHediff(hediff);
+            }
         }
 	}
 }

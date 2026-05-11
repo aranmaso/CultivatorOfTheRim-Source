@@ -9,15 +9,16 @@ namespace CultivatorOfTheRim
     [HarmonyPatch("DoStrike")]
     public class WeatherEvent_LightningStrikeGiveSpiritItemPatch
     {
-        private static void Postfix(ref IntVec3 strikeLoc, ref Map map, ref Mesh boltMesh)
+        private static void Postfix(ref IntVec3 strikeLoc, ref Map map, Mesh boltMesh)
         {
-            if (Rand.Value <= CTR_DefOf.CTR_AzureFragment.generateCommonality && !strikeLoc.Fogged(map) && !strikeLoc.Impassable(map))
+            if (map == null) return;
+            if (Rand.Value <= CTR_DefOf.CTR_AzureFragment.generateCommonality && !strikeLoc.Fogged(map))
             {
                 Thing thing = ThingMaker.MakeThing(CTR_DefOf.CTR_AzureFragment);
                 thing.HitPoints += 10;
                 GenSpawn.Spawn(thing, strikeLoc, map);
             }
-            else if (Rand.Value <= CultivatorOfTheRimMod.settings.tribRemnantChance && !strikeLoc.Fogged(map) && !strikeLoc.Impassable(map))
+            else if (Rand.Value <= CultivatorOfTheRimMod.settings.tribRemnantChance && !strikeLoc.Fogged(map))
             {
                 Thing thing = ThingMaker.MakeThing(CTR_DefOf.CTR_TribulationRemnantPill);
                 thing.HitPoints += 10;

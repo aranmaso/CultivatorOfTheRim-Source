@@ -1,8 +1,8 @@
 ﻿using RimWorld;
 using Verse;
 using System.Collections.Generic;
-using RimWorld.Planet;
 using UnityEngine;
+using RimWorld.Planet;
 
 namespace CultivatorOfTheRim
 {
@@ -131,7 +131,6 @@ namespace CultivatorOfTheRim
             base.PostExposeData();
             Scribe_Values.Look(ref gradeInt, "grade", ItemGrade.Mortal);
         }
-        
         public override void PostPostGeneratedForTrader(TraderKindDef trader, PlanetTile forTile, Faction forFaction)
         {
             SetGrade(Cultivation_Utility.GenerateGradeTraderItem());

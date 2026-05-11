@@ -6,7 +6,7 @@ using UnityEngine;
 using Verse;
 
 namespace CultivatorOfTheRim
-{
+{    
     public class ScenPart_ForcedCultivation : ScenPart_PawnModifier
     {
         private Dictionary<HediffDef, float> hediffs = new Dictionary<HediffDef, float>();
@@ -26,7 +26,7 @@ namespace CultivatorOfTheRim
             { 9, "Lower Qi Cultivating"},
             { 12, "Upper Qi Cultivating"},
             { 17, "Heaven Ascending"},
-            { 19, "Domain Ascending" }
+            { 20, "Domain Ascending" }
         };
 
         private IntRange stageRange;
@@ -90,11 +90,11 @@ namespace CultivatorOfTheRim
         public void UpdateHediffs()
         {
             hediffs.Clear();
-            foreach (var item in Cultivation_Utility.realmListRanking)
+            foreach (var item in StaticCollectionCached.CultivationHediffDefs)
             {
-                if (item.Key >= minRange && item.Key <= maxRange)
+                if (item.realmPower >= minRange && item.realmPower <= maxRange)
                 {
-                    hediffs.SetOrAdd(item.Value, Cultivation_Utility.RealmListChance[item.Value]);
+                    hediffs.SetOrAdd(item, item.realmWeight);
                 }
             }
             /*foreach (var item in minList)
@@ -225,20 +225,83 @@ namespace CultivatorOfTheRim
         {
             AddHediff(p);
         }
-        private void AddHediff(Pawn p)
-        {            
-            Hediff hediff = HediffMaker.MakeHediff(hediffs.RandomElementByWeight(x => x.Value).Key, p);
-            Hediff hediff2 = HediffMaker.MakeHediff(CTR_DefOf.CTR_BreakthroughCounter,p);
-            int selectedStage = stageRange.RandomInRange;
-            if (selectedStage > hediff.def.stages.Count())
+
+        public bool CheckCultivationFilter(Pawn pawn)
+        {
+            foreach (var item in StaticCollectionCached.FactionCultivationDef.Where(x => x.isBlacklist))
             {
-                selectedStage = hediff.def.stages.Count();
+                if (item.packageId != null)
+                {
+                    if (pawn.def.modContentPack?.PackageId == item.packageId || pawn.kindDef?.modContentPack?.PackageId == item.packageId || pawn.Faction?.def.modContentPack?.PackageId == item.packageId)
+                    {
+                        return false;
+                    }
+                }
+                if (ModsConfig.BiotechActive && pawn.RaceProps.Humanlike)
+                {
+                    if (item.xenotypeDefs.Contains(pawn.genes.Xenotype))
+                    {
+                        return false;
+                    }
+                }
+                if (item.pawnKindDef == pawn.kindDef)
+                {
+                    return false;
+                }
+                if (pawn.Faction != null)
+                {
+                    if (item.factionDefs.NotNullAndContains(pawn.Faction.def))
+                    {
+                        return false;
+                    }
+                }
             }
-            float sev = 0f;
-            sev = hediff.def.stages[selectedStage - 1].minSeverity;
-            hediff.Severity = sev;
-            p.health.AddHediff(hediff);
-            p.health.AddHediff(hediff2);
+            return true;
+        }
+        private void AddHediff(Pawn p)
+        {
+            if(!CheckCultivationFilter(p)) return;
+            if (p.RaceProps.IsMechanoid)
+            {
+                Hediff hediff = HediffMaker.MakeHediff(hediffs.Where(x => x.Key.hediffClass != typeof(Hediff_BodyCultivaton)).RandomElementByWeight(x => x.Value).Key, p);
+                Hediff hediff2 = HediffMaker.MakeHediff(CTR_DefOf.CTR_BreakthroughCounter, p);
+                int selectedStage = stageRange.RandomInRange;
+                if (selectedStage > hediff.def.stages.Count())
+                {
+                    selectedStage = hediff.def.stages.Count();
+                }
+                float sev = 0f;
+                sev = hediff.def.stages[selectedStage - 1].minSeverity;
+                hediff.Severity = sev;
+                p.health.AddHediff(hediff);
+                p.health.AddHediff(hediff2);
+                Messages.Message(p.LabelShort + " spawned with " + hediff.Label, p, MessageTypeDefOf.SilentInput);
+            }
+            else
+            {
+                Hediff hediff = HediffMaker.MakeHediff(hediffs.RandomElementByWeight(x => x.Value).Key, p);
+                Hediff hediff2 = HediffMaker.MakeHediff(CTR_DefOf.CTR_BreakthroughCounter, p);
+                int selectedStage = stageRange.RandomInRange;
+                if (selectedStage > hediff.def.stages.Count())
+                {
+                    selectedStage = hediff.def.stages.Count();
+                }
+                float sev = 0f;
+                sev = hediff.def.stages[selectedStage - 1].minSeverity;
+                hediff.Severity = sev;
+                p.health.AddHediff(hediff);
+                p.health.AddHediff(hediff2);
+                Messages.Message(p.LabelShort + " spawned with " + hediff.Label, p, MessageTypeDefOf.SilentInput);
+            }
+            
+            /*if (p.MapHeld != null)
+            {
+                Messages.Message(p.LabelShort + " spawned with " + hediff.Label, p, MessageTypeDefOf.NeutralEvent);
+            }
+            else
+            {
+                Messages.Message(p.LabelShort + " spawned with " + hediff.Label, MessageTypeDefOf.NeutralEvent);
+            }*/
         }
 
 

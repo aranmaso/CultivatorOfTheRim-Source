@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using RimWorld;
+using RimWorld.Planet;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions.Must;
@@ -40,7 +41,10 @@ namespace CultivatorOfTheRim
             float finalChance = dantianDamageChance + extraChance;
             if (hitTorso && Rand.Value < finalChance)
             {
-                MoteMaker.ThrowText(__instance.PositionHeld.ToVector3(), __instance.Map, "Dantian Hit!", Color.red);
+                if(__instance.Map != null)
+                {
+                    MoteMaker.ThrowText(__instance.PositionHeld.ToVector3(), __instance.MapHeld, "Dantian Hit!", Color.red);
+                }
                 if (!__instance.health.hediffSet.HasHediff(CTR_DefOf.CTR_DantianDamage))
                 {
                     BodyPartRecord br = __instance.RaceProps.body.AllParts.FirstOrDefault(x => x.def == CTR_DefOf.Stomach);
@@ -55,7 +59,10 @@ namespace CultivatorOfTheRim
             }
             if (hitStomach && Rand.Value < finalChance + 0.1f)
             {
-                MoteMaker.ThrowText(__instance.PositionHeld.ToVector3(), __instance.Map, "Dantian Hit!", Color.red);
+                if (__instance.Map != null)
+                {
+                    MoteMaker.ThrowText(__instance.PositionHeld.ToVector3(), __instance.MapHeld, "Dantian Hit!", Color.red);
+                }
                 if (!__instance.health.hediffSet.HasHediff(CTR_DefOf.CTR_DantianDamage))
                 {
                     Hediff dantinaDamage = HediffMaker.MakeHediff(CTR_DefOf.CTR_DantianDamage, __instance, dinfo.HitPart);

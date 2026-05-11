@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using Verse;
+﻿
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using RimWorld;
 using UnityEngine;
-using System;
-using System.Linq;
-using System.Collections;
-using static HarmonyLib.Code;
+using Verse;
 
 namespace CultivatorOfTheRim
 {
@@ -20,10 +20,34 @@ namespace CultivatorOfTheRim
 
             return tinfo;
         }
-        
+
+        public static bool IsCoreShapingOrAbove(this Hediff h)
+        {
+            if (h.def.tags.Contains("CTR_CoreShapingOrAbove"))
+            {
+                return true;
+            }
+            return false;
+        }
+        public static bool IsSaintRealmOrAbove(this Hediff h)
+        {
+            if (h.def.tags.Contains("CTR_SaintRealmOrAbove"))
+            {
+                return true;
+            }
+            return false;
+        }
+        public static bool IsCreationRealmOrAbove(this Hediff h)
+        {
+            if (h.def.tags.Contains("CTR_Creation_RealmOrAbove"))
+            {
+                return true;
+            }
+            return false;
+        }
         public static bool TryGiveCultivationBasedOnBackstory(Pawn pawn)
         {
-            if (pawn.HaveCultivation())
+            if (pawn.HaveAnyCultivation())
             {
                 return false;
             }
@@ -39,7 +63,7 @@ namespace CultivatorOfTheRim
                         int num = backstoryDefs[pawn.story.Childhood];
                         int num2 = Rand.RangeInclusive(0, 1);
                         int num3 = num + num2;
-                        HediffDef cultivationRealm = realmListRanking[num3];
+                        HediffDef cultivationRealm = StaticCollectionCached.CultivationRealmPower.Where(x => x.Value == num3).RandomElement().Key;
                         Hediff hediff = CreateHediffNoDuration(pawn, cultivationRealm);
                         hediff.Severity = hediff.def.stages.RandomElement().minSeverity;
                         pawn.health.AddHediff(hediff);
@@ -66,7 +90,7 @@ namespace CultivatorOfTheRim
                         if (num1 > num) num = num1;
                         int num2 = Rand.RangeInclusive(0, 1);
                         int num3 = num + num2;
-                        HediffDef cultivationRealm = realmListRanking[num3];
+                        HediffDef cultivationRealm = StaticCollectionCached.CultivationRealmPower.Where(x => x.Value == num3).RandomElement().Key;
                         Hediff hediff = CreateHediffNoDuration(pawn, cultivationRealm);
                         hediff.Severity = hediff.def.stages.RandomElement().minSeverity;
                         pawn.health.AddHediff(hediff);
@@ -81,20 +105,72 @@ namespace CultivatorOfTheRim
             }
             return false;
         }
-        public static Hediff_CultivationLevel FindCultivationLevel(Pawn pawn)
+
+        public static Hediff_CultivationBase FindAnyCultivationLevel(this Pawn pawn)
         {
-            Hediff_CultivationLevel hediff_CultivationLevel = null;
-            List<Hediff> hediffs = pawn.health.hediffSet.hediffs;
+            IReadOnlyList<Hediff> hediffs = pawn.health.hediffSet.hediffs;
             for (int i = 0; i < hediffs.Count; i++)
             {
-                if (hediffs[i] is Hediff_CultivationLevel hediff_CultivationLevel2 && hediffs[i].Visible)
+                if (hediffs[i] is Hediff_CultivationBase hediff_CultivationBase && hediffs[i].Visible)
                 {
-                    hediff_CultivationLevel = hediff_CultivationLevel2;
+                    return hediff_CultivationBase;
+                }
+            }
+            return null;
+        }
+        public static Hediff_CultivationLevel FindCultivationLevel(this Pawn pawn)
+        {
+            IReadOnlyList<Hediff> hediffs = pawn.health.hediffSet.hediffs;
+            for (int i = 0; i < hediffs.Count; i++)
+            {
+                if (hediffs[i] is Hediff_CultivationLevel hediff_CultivationLevel && hediffs[i].Visible)
+                {
                     return hediff_CultivationLevel;
                 }
             }
             return null;
             
+        }
+
+        public static Hediff_BodyCultivaton FindBodyCultivationLevel(this Pawn pawn)
+        {
+            IReadOnlyList<Hediff> hediffs = pawn.health.hediffSet.hediffs;
+            for (int i = 0; i < hediffs.Count; i++)
+            {
+                if (hediffs[i] is Hediff_BodyCultivaton hediffBod && hediffBod.Visible)
+                {
+                    return hediffBod;
+                }
+            }
+            return null;
+        }
+
+        public static Hediff_BodyCultivaton FindNotMaxedBodyCultivationLevel(this Pawn pawn)
+        {
+            IReadOnlyList<Hediff> hediffs = pawn.health.hediffSet.hediffs;
+            for (int i = 0; i < hediffs.Count; i++)
+            {
+                if (hediffs[i] is Hediff_BodyCultivaton hediffBod && hediffBod.Visible)
+                {
+                    return hediffBod;
+                }
+            }
+            return null;
+        }
+        public static Hediff_CultivationLevel FindNotMaxedCultivationLevel(this Pawn pawn)
+        {
+            Hediff_CultivationLevel hediffCultivation = null;
+            List<Hediff> hediffs = pawn.health.hediffSet.hediffs;
+            for (int i = 0; i < hediffs.Count; i++)
+            {
+                if (hediffs[i] is Hediff_CultivationLevel hediff_CultivationLevel && hediffs[i].Visible)
+                {
+                    if (hediff_CultivationLevel.Severity >= hediff_CultivationLevel.def.maxSeverity) continue;
+                    hediffCultivation = hediff_CultivationLevel;
+                    return hediffCultivation;
+                }
+            }
+            return null;
         }
         public static bool HaveCultivation(this Pawn p)
         {
@@ -107,26 +183,90 @@ namespace CultivatorOfTheRim
             }
             return false;
         }
-        public static bool HaveCultivationOutHediff(Pawn p,out Hediff hediff)
+
+        public static bool HaveBodyCultivation(this Pawn p)
         {
-            for(int i = 0;i < p.health.hediffSet.hediffs.Count; i++)
+            for (int i = 0; i < p.health.hediffSet.hediffs.Count; i++)
             {
-                if (p.health.hediffSet.hediffs[i] is Hediff_CultivationLevel c2 && c2.Visible)
+                if (p.health.hediffSet.hediffs[i] is Hediff_BodyCultivaton c2 && c2.Visible)
                 {
-                    hediff = p.health.hediffSet.hediffs[i];
+                    return true;
+                }
+            }
+            return false;
+        }
+        public static bool HaveAnyCultivation(this Pawn p)
+        {
+            IReadOnlyList<Hediff> hediffs = p.health.hediffSet.hediffs;
+            for (int i = 0; i < hediffs.Count; i++)
+            {
+                if (hediffs[i] is Hediff_CultivationBase)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        public static bool HaveAnyCultivationOutHediff(this Pawn p,out Hediff_CultivationBase hediff)
+        {
+            IReadOnlyList<Hediff> hediffs = p.health.hediffSet.hediffs;
+            for (int i = 0; i < hediffs.Count; i++)
+            {
+                if (hediffs[i] is Hediff_CultivationBase { Visible: true } c2)
+                {
+                    hediff = c2;
+                    return true;
+                }
+            }
+            hediff =  null;
+            return false;
+        }
+        public static bool HaveBodyCultivationOutHediff(this Pawn p,out Hediff_BodyCultivaton hediff)
+        {
+            for (int i = 0; i < p.health.hediffSet.hediffs.Count; i++)
+            {
+                if (p.health.hediffSet.hediffs[i] is Hediff_BodyCultivaton c2 && c2.Visible)
+                {
+                    hediff = c2;
                     return true;
                 }
             }
             hediff = null;
             return false;
         }
-        public static bool HaveCultivationOutHediffDef(Pawn p,out HediffDef hediffDef)
+        public static bool HaveBodyCultivationOutHediffDef(this Pawn p,out HediffDef hediff)
+        {
+            for (int i = 0; i < p.health.hediffSet.hediffs.Count; i++)
+            {
+                if (p.health.hediffSet.hediffs[i] is Hediff_BodyCultivaton c2 && c2.Visible)
+                {
+                    hediff = c2.def;
+                    return true;
+                }
+            }
+            hediff = null;
+            return false;
+        }
+        public static bool HaveCultivationOutHediff(this Pawn p,out Hediff_CultivationLevel hediff)
         {
             for(int i = 0;i < p.health.hediffSet.hediffs.Count; i++)
             {
                 if (p.health.hediffSet.hediffs[i] is Hediff_CultivationLevel c2 && c2.Visible)
                 {
-                    hediffDef = p.health.hediffSet.hediffs[i].def;
+                    hediff = c2;
+                    return true;
+                }
+            }
+            hediff = null;
+            return false;
+        }
+        public static bool HaveCultivationOutHediffDef(this Pawn p,out CultivationHediffDef hediffDef)
+        {
+            for(int i = 0;i < p.health.hediffSet.hediffs.Count; i++)
+            {
+                if (p.health.hediffSet.hediffs[i] is Hediff_CultivationLevel c2 && c2.Visible)
+                {
+                    hediffDef = c2.cultivationDef;
                     return true;
                 }
             }
@@ -134,19 +274,34 @@ namespace CultivatorOfTheRim
             return false;
         }
 
-        public static HediffDef GetHighestCultivationHediff(HediffDef h1,HediffDef h2)
+        public static CultivationHediffDef GetHighestCultivationHediff(CultivationHediffDef h1, CultivationHediffDef h2)
         {
-            IDictionary<HediffDef,int> rlist = realmListAll;
-            int num = Mathf.Max(rlist[h1], rlist[h2]);
-            HediffDef h3 = realmListRanking[num];
-            return h3;
+            int h1_num = StaticCollectionCached.CultivationRealmPower[h1];
+            int h2_num = StaticCollectionCached.CultivationRealmPower[h2];
+            if (h1_num > h2_num) return h1;
+            else return h2;
         }
 
-        public static HediffDef GetHighestCultivationFromList(List<HediffDef> hlist)
+        public static bool IsBodyCultivation(this HediffDef hediffDef)
+        {
+            return hediffDef.hediffClass == typeof(Hediff_BodyCultivaton);
+        }
+
+        public static bool IsQiCultivation(this HediffDef hediffDef)
+        {
+            return hediffDef.hediffClass == typeof(Hediff_CultivationLevel);
+        }
+
+        public static bool isCultivationHediff(this HediffDef hediffDef)
+        {
+            return hediffDef is CultivationHediffDef;
+        }
+        public static HediffDef GetHighestCultivationFromList(List<CultivationHediffDef> hlist)
         {
             HediffDef hediff = null;
-            int num = 0;
-            foreach(var item in hlist)
+            hediff = hlist.OrderByDescending(x => x.realmPower).FirstOrDefault();
+            /*int num = 0;
+            foreach (var item in hlist)
             {
                 if (realmListAll[item] > num)
                 {
@@ -157,14 +312,14 @@ namespace CultivatorOfTheRim
                     continue;
                 }
             }
-            hediff = realmListRanking[num];
+            hediff = realmListRanking[num];*/
             return hediff;
         }
 
-        public static int GetRealmDifferent(HediffDef h1, HediffDef h2)
+        public static int GetRealmDifferent(CultivationHediffDef h1, CultivationHediffDef h2)
         {
-            int num = realmListAll[h1];
-            int num2 = realmListAll[h2];
+            int num = h1.realmPower;
+            int num2 = h2.realmPower;
             int num3 = Mathf.Max(num,num2) - Mathf.Min(num,num2);
             return num3;
         }
@@ -429,10 +584,10 @@ namespace CultivatorOfTheRim
         public static ItemGrade GenerateGradeCreatedByPawn(Pawn pawn)
         {
             int cultivationLevel = 0;
-            Hediff_CultivationLevel level = FindCultivationLevel(pawn);
+            Hediff_CultivationBase level = pawn.FindAnyCultivationLevel();
             if(level != null)
             {
-                cultivationLevel = realmListAll[level.def];
+                cultivationLevel = level.cultivationDef.realmPower;
                 /*foreach (var item in realmListAll)
                 {
                     if (item.Key == level.def)
@@ -528,6 +683,9 @@ namespace CultivatorOfTheRim
                 case 19:
                     num += 20f;
                     break;
+                case 20:
+                    num += 999f;
+                    break;
             }
             int value = (int)Rand.GaussianAsymmetric(num, 0.6f, 0.8f);
             value = Mathf.Clamp(value, 0, 7);
@@ -550,20 +708,12 @@ namespace CultivatorOfTheRim
         }
 
         //PillGrade
-        public static PillGrade GeneratePillGradeCreatedByPawn(Pawn pawn, Hediff_CultivationLevel level)
+        public static PillGrade GeneratePillGradeCreatedByPawn(Pawn pawn, Hediff_CultivationBase level)
         {
             int cultivationLevel = 0;
             if (level != null)
             {
-                cultivationLevel = realmListAll[level.def];
-                /*foreach (var item in realmListAll)
-                {
-                    if (item.Key == level.def)
-                    {
-                        cultivationLevel = item.Value;
-                        break;
-                    }
-                }*/
+                cultivationLevel = level.cultivationDef.realmPower;
             }
             bool flag = pawn.InspirationDef == InspirationDefOf.Inspired_Creativity;
             PillGrade gradeCategory = GeneratePillQualityCreatedByCultivator(cultivationLevel, flag);
@@ -650,6 +800,9 @@ namespace CultivatorOfTheRim
                     break;
                 case 19:
                     num += 20f;
+                    break;
+                case 20:
+                    num += 999f;
                     break;
             }
             int value = (int)Rand.GaussianAsymmetric(num, 0.6f, 0.8f);
@@ -762,6 +915,9 @@ namespace CultivatorOfTheRim
                 case 19:
                     text = "Immortal_Qi";
                     break;
+                case 20:
+                    text = "Immortal_Qi";
+                    break;
 
             }
             return text;
@@ -780,11 +936,11 @@ namespace CultivatorOfTheRim
             { CTR_DefOf.CTR_ExiledDis,4},
             { CTR_DefOf.CTR_AlchemyDis,5},
             { CTR_DefOf.CTR_DemonDis,6},
-            { CTR_DefOf.CTR_SectMaster,8},
+            { CTR_DefOf.CTR_SectMaster,9},
             { CTR_DefOf.CTR_SectElder,7}
         };
 
-        public static IDictionary<HediffDef,int > realmListAll = new Dictionary<HediffDef, int>()
+        /*public static IDictionary<HediffDef,int > realmListAll = new Dictionary<HediffDef, int>()
         {
             { CTR_DefOf.CTR_BodyTempering,1},
             { CTR_DefOf.CTR_MarrowCleansing,2},
@@ -807,6 +963,31 @@ namespace CultivatorOfTheRim
             { CTR_DefOf.CTR_OutsidetheDomain, 19 }
         };
 
+        public static IDictionary<int, HediffDef> realmListAllReverseKey = new Dictionary<int, HediffDef>()
+        {
+            {1, CTR_DefOf.CTR_BodyTempering},
+            {2, CTR_DefOf.CTR_MarrowCleansing},
+            {3, CTR_DefOf.CTR_BoneForging},
+            {4, CTR_DefOf.CTR_Qi_Gathering},
+            {5, CTR_DefOf.CTR_FoundationEstablishment},
+            {6, CTR_DefOf.CTR_CoreShaping},
+            {7, CTR_DefOf.CTR_GoldenCore},
+            {8, CTR_DefOf.CTR_PatternedGoldenCore},
+            {9, CTR_DefOf.CTR_NascentSoul},
+            {10, CTR_DefOf.CTR_DualNascentSoul},
+            {11, CTR_DefOf.CTR_Transcendent},
+            {12, CTR_DefOf.CTR_HalfStep_Saint},
+            {13, CTR_DefOf.CTR_SaintRealm},
+            {14, CTR_DefOf.CTR_SaintKing},
+            {15, CTR_DefOf.CTR_ImmortalAscension},
+            {16, CTR_DefOf.CTR_TrueImmortal},
+            {17, CTR_DefOf.CTR_ImmortalSaint},
+            {18, CTR_DefOf.CTR_HalfStep_God},
+            {19, CTR_DefOf.CTR_True_God},
+            {20, CTR_DefOf.CTR_Creation_Realm},
+            {21, CTR_DefOf.CTR_OutsidetheDomain}
+        };
+
         public static IDictionary<int,HediffDef> realmListRanking = new Dictionary<int,HediffDef>()
         {
             {1, CTR_DefOf.CTR_BodyTempering},
@@ -816,18 +997,20 @@ namespace CultivatorOfTheRim
             {5, CTR_DefOf.CTR_FoundationEstablishment},
             {6, CTR_DefOf.CTR_CoreShaping},
             {7, CTR_DefOf.CTR_GoldenCore},
-            {8, CTR_DefOf.CTR_NascentSoul},
-            {9, CTR_DefOf.CTR_Transcendent},
-            {10, CTR_DefOf.CTR_HalfStep_Saint},
-            {11, CTR_DefOf.CTR_SaintRealm},
-            {12, CTR_DefOf.CTR_SaintKing},
-            {13, CTR_DefOf.CTR_ImmortalAscension},
-            {14, CTR_DefOf.CTR_TrueImmortal},
-            {15, CTR_DefOf.CTR_ImmortalSaint},
-            {16, CTR_DefOf.CTR_HalfStep_God},
-            {17, CTR_DefOf.CTR_True_God},
-            {18, CTR_DefOf.CTR_Creation_Realm},
-            {19, CTR_DefOf.CTR_OutsidetheDomain}
+            {8, CTR_DefOf.CTR_PatternedGoldenCore},
+            {9, CTR_DefOf.CTR_NascentSoul},
+            {10, CTR_DefOf.CTR_DualNascentSoul},
+            {11, CTR_DefOf.CTR_Transcendent},
+            {12, CTR_DefOf.CTR_HalfStep_Saint},
+            {13, CTR_DefOf.CTR_SaintRealm},
+            {14, CTR_DefOf.CTR_SaintKing},
+            {15, CTR_DefOf.CTR_ImmortalAscension},
+            {16, CTR_DefOf.CTR_TrueImmortal},
+            {17, CTR_DefOf.CTR_ImmortalSaint},
+            {18, CTR_DefOf.CTR_HalfStep_God},
+            {19, CTR_DefOf.CTR_True_God},
+            {20, CTR_DefOf.CTR_Creation_Realm},
+            {21, CTR_DefOf.CTR_OutsidetheDomain}
         };
 
         public static Dictionary<HediffDef, float> RealmList = new Dictionary<HediffDef, float>()
@@ -852,6 +1035,7 @@ namespace CultivatorOfTheRim
             { CTR_DefOf.CTR_Creation_Realm, 0.0005f},
             { CTR_DefOf.CTR_OutsidetheDomain, 0.0005f}
         };
+
         public static Dictionary<HediffDef, float> RealmListChance = new Dictionary<HediffDef, float>()
         {
             { CTR_DefOf.CTR_BodyTempering, 15f},
@@ -861,7 +1045,9 @@ namespace CultivatorOfTheRim
             { CTR_DefOf.CTR_FoundationEstablishment, 11f},
             { CTR_DefOf.CTR_CoreShaping, 10f},
             { CTR_DefOf.CTR_GoldenCore, 9f},
+            { CTR_DefOf.CTR_PatternedGoldenCore, 4f},
             { CTR_DefOf.CTR_NascentSoul, 8f},
+            { CTR_DefOf.CTR_DualNascentSoul, 4f},
             { CTR_DefOf.CTR_Transcendent, 7f},
             { CTR_DefOf.CTR_HalfStep_Saint, 6f},
             { CTR_DefOf.CTR_SaintRealm, 5f},
@@ -890,7 +1076,9 @@ namespace CultivatorOfTheRim
             { CTR_DefOf.CTR_FoundationEstablishment, 0.11f},
             { CTR_DefOf.CTR_CoreShaping, 0.10f},
             { CTR_DefOf.CTR_GoldenCore, 0.09f},
+            { CTR_DefOf.CTR_PatternedGoldenCore, 0.05f},
             { CTR_DefOf.CTR_NascentSoul, 0.08f},
+            { CTR_DefOf.CTR_DualNascentSoul, 0.05f},
             { CTR_DefOf.CTR_Transcendent, 0.07f},
             { CTR_DefOf.CTR_HalfStep_Saint, 0.06f},
             { CTR_DefOf.CTR_SaintRealm, 0.05f},
@@ -905,7 +1093,9 @@ namespace CultivatorOfTheRim
             { CTR_DefOf.CTR_FoundationEstablishment, 0.11f},
             { CTR_DefOf.CTR_CoreShaping, 0.10f},
             { CTR_DefOf.CTR_GoldenCore, 0.09f},
+            { CTR_DefOf.CTR_PatternedGoldenCore, 0.05f},
             { CTR_DefOf.CTR_NascentSoul, 0.08f},
+            { CTR_DefOf.CTR_DualNascentSoul, 0.05f},
             { CTR_DefOf.CTR_Transcendent, 0.07f},
             { CTR_DefOf.CTR_HalfStep_Saint, 0.06f},
             { CTR_DefOf.CTR_SaintRealm, 0.05f},
@@ -915,12 +1105,12 @@ namespace CultivatorOfTheRim
             { CTR_DefOf.CTR_ImmortalSaint, 0.01f},
             { CTR_DefOf.CTR_HalfStep_God, 0.005f},
             { CTR_DefOf.CTR_True_God, 0.003f},
-        };
+        };*/
 
-        public static Dictionary<HediffDef, float> GetRealmDict()
+        /*public static Dictionary<HediffDef, float> GetRealmDict()
         {
             return RealmList;
-        }
+        }*/
 
         public static Dictionary<string, float> qiSourceMultiplier = new Dictionary<string, float>()
         {
@@ -1029,6 +1219,7 @@ namespace CultivatorOfTheRim
                     num *= p.GetStatValue(CTR_DefOf.CTR_EarthQi_AbsorptionMultiplier);
                     break;
             }
+            num *= p.GetStatValue(CTR_DefOf.CTR_Qi_AbsorptionMultiplier);
             return num;
         }
 
@@ -1203,7 +1394,7 @@ namespace CultivatorOfTheRim
             return text;
         }
 
-        public static HediffDef GetRandomRealmByWeight()
+        /*public static HediffDef GetRandomRealmByWeight()
         {
             
             float rand = Rand.Value;
@@ -1229,18 +1420,18 @@ namespace CultivatorOfTheRim
             
             
             return null;
-        }
+        }*/
 
-        public static float GetBreakthroughChance(Pawn pawn, HediffDef nextLevel = null)
+        public static float GetBreakthroughChance(Pawn pawn, bool otdm)
         {
             if (pawn.RaceProps.Humanlike)
             {
                 float baseNum = 1f;
                 float num = pawn.health.summaryHealth.SummaryHealthPercent;
-                float num2 = pawn.needs.mood.CurLevelPercentage;
+                float num2 = pawn.needs.mood?.CurLevelPercentage ?? 1f;
                 float num3 = Mathf.Clamp(pawn.health.capacities.GetLevel(PawnCapacityDefOf.Consciousness), 0.01f, 1f);
                 float final = baseNum * num * num2 * num3;
-                if (nextLevel != null && nextLevel == CTR_DefOf.CTR_OutsidetheDomain)
+                if (otdm)
                 {
                     float num4 = pawn.GetStatValue(CTR_DefOf.TribulationChance);
                     float num5 = 1f - num4;
@@ -1334,7 +1525,36 @@ namespace CultivatorOfTheRim
                 
             }
 
-        }        
+        }
+        public static bool NotNullOrEmpty<T>(this IList<T> list) => list is { Count: > 0 };
+        
+        public static bool NotNullOrEmpty<K, V>(this Dictionary<K, V> dict)
+        {
+            if (dict != null)
+            {
+                return dict.Count > 0;
+            }
+
+            return false;
+        }
+        public static void AddToList<T>(this IList<T> list, IList<T> newList)
+        {
+            foreach (var item in newList)
+            {
+                list.Add(item);
+            }
+        }
+
+        public static bool HasTradeTag(this ThingDef thingDef, string t)
+        {
+            return thingDef.tradeTags?.NotNullAndContains(t) ?? false;
+        }
+
+        public static bool HasTradeTag(this Thing thing, string t)
+        {
+            return thing.def.tradeTags?.NotNullAndContains(t) ?? false;
+        }
+        
     }
 
 }

@@ -26,11 +26,10 @@ namespace CultivatorOfTheRim
             Scribe_Values.Look(ref gradeInt, "grade", PillGrade.Spirit);
         }
 
-        public override void PostPostGeneratedForTrader(TraderKindDef trader, int forTile, Faction forFaction)
+        public override void PostPostGeneratedForTrader(TraderKindDef trader, PlanetTile forTile, Faction forFaction)
         {
             SetGrade(Cultivation_Utility.GeneratePillGradeTraderItem());
         }
-
         public override bool AllowStackWith(Thing other)
         {
             if (Cultivation_Utility.TryGetPillGrade(other, out var qc))

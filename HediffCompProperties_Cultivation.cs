@@ -1,6 +1,7 @@
 ﻿using Verse;
 using RimWorld;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace CultivatorOfTheRim
 {
@@ -11,6 +12,10 @@ namespace CultivatorOfTheRim
         public HediffDef currentLevel;
 
         public HediffDef nextLevel;
+
+        public List<BonusHediff> bonusHediff;
+
+        public List<BreakThroughRealmInfo> nextLevels;
 
         public float TribulationMultiplier = 1;
 
@@ -29,11 +34,25 @@ namespace CultivatorOfTheRim
         public string uiIcon;
 
         public List<CultivatorNeedInfo> changeToNeeds;
+        
+        public Texture2D  uiIconTexture;
 
         public bool requireQiSource = true;
         public HediffCompProperties_Cultivation()
         {
             compClass = typeof(HediffComp_Cultivation);
         }
+
+        public override void ResolveReferences(HediffDef parent)
+        {
+            base.ResolveReferences(parent);
+            LongEventHandler.ExecuteWhenFinished(delegate
+            {
+                uiIconTexture = ContentFinder<Texture2D>.Get(uiIcon);
+            });
+        }
     }
+    
+
+    
 }

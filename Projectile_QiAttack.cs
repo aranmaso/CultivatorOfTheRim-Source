@@ -21,7 +21,7 @@ namespace CultivatorOfTheRim
                 {
                     if(Cultivation_Utility.HaveCultivation(pawnLauncher))
                     {
-                        return Mathf.RoundToInt(def.projectile.GetDamageAmount(weaponDamageMultiplier) * launcher.GetStatValue(CTR_DefOf.TechniqueEfficiency));
+                        return Mathf.RoundToInt(def.projectile.GetDamageAmount(equipment) * launcher.GetStatValue(CTR_DefOf.TechniqueEfficiency));
                     }
                     else
                     {

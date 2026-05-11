@@ -11,6 +11,8 @@ namespace CultivatorOfTheRim
         public static HediffDef CTR_BreakthroughCounter;
         public static HediffDef CTR_BreakthroughProcess;
         public static HediffDef CTR_DantianDamage;
+        
+        public static BodyPartDef Pelvis;
 
         public static StatCategoryDef CTR_PawnCultivation;
 
@@ -22,6 +24,8 @@ namespace CultivatorOfTheRim
         public static ThingDef Mote_ResurrectAbility;
         public static ThingDef CTR_JunkPill;
         public static ThingDef CTR_TribulationRemnantPill;
+        public static ThingDef CTR_QiCondensingPill;
+        public static ThingDef CTR_BodyTemperingPill;
         public static ThingDef CTR_AzureFragment;
 
         public static ThingDef CTR_SpiritStone;
@@ -31,7 +35,14 @@ namespace CultivatorOfTheRim
         public static ThingDef CTR_SpiritStone_Condensed_5X;
         public static ThingDef CTR_SpiritStone_Condensed_6X;
 
+        public static ThingDef CTR_SpiritGrassPlant;
+
+        public static ThingDef CTR_AlchemyFurnace_Basic;
+        public static ThingDef CTR_AlchemyFurnace_Intermediate;
+
         public static ThingDef CTR_BeastCore;
+        public static ThingDef CTR_GoldenCore_Core;
+        public static ThingDef CTR_ImmortalCore;
         public static DamageDef CTR_TribulationLightning;
 
         public static ThingCategoryDef Artifacts;
@@ -52,6 +63,8 @@ namespace CultivatorOfTheRim
         public static FleckDef CTR_AbsorbQiOrbFire;
         public static FleckDef CTR_AbsorbQiOrbEarth;
 
+        public static HediffDef CTR_MartialApprentice;
+
         public static HediffDef CTR_BodyTempering;
         public static HediffDef CTR_MarrowCleansing;
         public static HediffDef CTR_BoneForging;
@@ -59,7 +72,9 @@ namespace CultivatorOfTheRim
         public static HediffDef CTR_FoundationEstablishment;
         public static HediffDef CTR_CoreShaping;
         public static HediffDef CTR_GoldenCore;
+        public static HediffDef CTR_PatternedGoldenCore;
         public static HediffDef CTR_NascentSoul;
+        public static HediffDef CTR_DualNascentSoul;
         public static HediffDef CTR_Transcendent;
         public static HediffDef CTR_HalfStep_Saint;
         public static HediffDef CTR_SaintRealm;
@@ -69,11 +84,14 @@ namespace CultivatorOfTheRim
         public static HediffDef CTR_ImmortalSaint;
         public static HediffDef CTR_HalfStep_God;
         public static HediffDef CTR_True_God;
-        public static HediffDef CTR_Creation_Realm;
-        public static HediffDef CTR_OutsidetheDomain;
+        public static CultivationHediffDef CTR_Creation_Realm;
+        public static CultivationHediffDef CTR_OutsidetheDomain;
+
+        public static HediffDef CTR_RebirthCultivation;
 
         public static RecipeDef CTR_MakeAlchemy;
         public static RecipeDef CTR_MakeTalisman;
+        public static RecipeDef CTR_MakeAlchemy_Generic;
 
         public static StatDef CultivationSpeed;
         public static StatDef TribulationChance;

@@ -13,11 +13,15 @@ namespace CultivatorOfTheRim
     {
         private RecipeExtension_MixingIngredient modExtension => recipe.GetModExtension<RecipeExtension_MixingIngredient>();
 
-        private bool passRequirement = false;        
+        private bool passRequirement = false;    
+        
+        public List<ThingDef> tempList = new List<ThingDef>();
+
+        public List<string> tempTagList = new List<string>();
         public override void Notify_IterationCompleted(Pawn billDoer, List<Thing> ingredients)
         {
             base.Notify_IterationCompleted(billDoer, ingredients);
-            Hediff_CultivationLevel level = Cultivation_Utility.FindCultivationLevel(billDoer);
+            Hediff_CultivationBase level = billDoer.FindAnyCultivationLevel();
             if (level != null)
             {
                 if (modExtension.allowedCultivationLevel.Any(x => level.def.tags.Contains(x)))
@@ -31,95 +35,204 @@ namespace CultivatorOfTheRim
             }
             if (passRequirement)
             {
-                bool firstMatch = false;
-                bool secondMatch = false;
-                ThingDef result = null;
-                foreach (var item in modExtension.combinations)
-                {
-                    if(ingredients[0].def.tradeTags.Contains(item.firstTag))
+                if (modExtension.fixedIngredient)
+                {                    
+                    RecipeCombination combination = null;
+                    tempList.Clear();
+                    foreach (var item in ingredients)
                     {
-                        firstMatch = true;
+                        tempList.Add(item.def);
                     }
-                    if (ingredients[1].def.tradeTags.Contains(item.secondTag))
+                    if (!tempList.NullOrEmpty())
                     {
-                        secondMatch = true;
+                        combination = modExtension.combinations.FirstOrDefault(x => tempList.Contains(x.firstThing) && tempList.Contains(x.secondThing));
                     }
-                    if(firstMatch && secondMatch)
+                    if (combination != null)
                     {
-                        result = item.result; 
-                        break;
+                        if (recipe == CTR_DefOf.CTR_MakeAlchemy)
+                        {
+                            DoAlchemyRecipe(billDoer, level, true, combination);
+                        }
+                        if (recipe == CTR_DefOf.CTR_MakeTalisman)
+                        {
+                            DoTalismanRecipe(billDoer, level, true, combination);
+                        }
+                        if (recipe == CTR_DefOf.CTR_MakeAlchemy_Generic)
+                        {
+                            DoAlchemyGenericRecipe(billDoer, level, true, combination);
+                        }
                     }
                     else
                     {
-                        firstMatch = false;
-                        secondMatch = false;
-                    }
-                    /*foreach(var tag in ingredients[1].def.tradeTags)
-                    {
-                        if(item.requireTag.Contains(tag))
+                        if (recipe == CTR_DefOf.CTR_MakeAlchemy)
                         {
-                            firstMatch = true;
-                            break;
+                            DoAlchemyRecipe(billDoer, level, false);
                         }
-                    }*/
-                    
+                        if (recipe == CTR_DefOf.CTR_MakeTalisman)
+                        {
+                            DoTalismanRecipe(billDoer, level, false);
+                        }
+                        if (recipe == CTR_DefOf.CTR_MakeAlchemy_Generic)
+                        {
+                            DoAlchemyGenericRecipe(billDoer, level, false);
+                        }
+                    }
                 }
-                if(recipe == CTR_DefOf.CTR_MakeAlchemy)
+                else
                 {
-                    if (Rand.Value < billDoer.GetStatValue(CTR_DefOf.AlchemySuccessChance) * recipe.recipeUsers.FirstOrDefault().GetStatValueAbstract(CTR_DefOf.AlchemyFurnaceQuality))
+                    RecipeCombination combination = null;
+                    foreach (var comb in modExtension.combinations)
                     {
-                        if (firstMatch && secondMatch)
+                        if (ingredients[0].HasTradeTag(comb.firstTag) && ingredients[1].HasTradeTag(comb.secondTag))
                         {
-                            Thing newThing = ThingMaker.MakeThing(result);
-                            bool flag = billDoer.InspirationDef == InspirationDefOf.Inspired_Creativity;
-                            float count = GetAmountResult(Cultivation_Utility.realmListAll[level.def], modExtension.count.min, modExtension.count.max, flag);
-                            newThing.stackCount = modExtension.count.RandomInRange;
-                            GenPlace.TryPlaceThing(newThing, billDoer.Position, billDoer.Map, ThingPlaceMode.Near);
-                            Messages.Message("mixing success! " + billDoer.LabelShort + " made a " + newThing.LabelCap, MessageTypeDefOf.PositiveEvent);
+                            combination = comb;
                         }
-                        else
+                    }
+                    if (combination != null)
+                    {
+                        if (recipe == CTR_DefOf.CTR_MakeAlchemy)
                         {
-                            Thing newThing = ThingMaker.MakeThing(modExtension.failedProduct);
-                            newThing.stackCount = modExtension.count.RandomInRange;
-                            GenPlace.TryPlaceThing(newThing, billDoer.Position, billDoer.Map, ThingPlaceMode.Near);
-                            Messages.Message("mixing failed, no valid combination", MessageTypeDefOf.NeutralEvent);
+                            DoAlchemyRecipe(billDoer, level, true, combination);
+                        }
+                        if (recipe == CTR_DefOf.CTR_MakeTalisman)
+                        {
+                            DoTalismanRecipe(billDoer, level, true, combination);
                         }
                     }
                     else
                     {
-                        Messages.Message("mixing failed, alchemy success chance too low", MessageTypeDefOf.NeutralEvent);
-                    }
-                }                
-                if(recipe == CTR_DefOf.CTR_MakeTalisman)
-                {
-                    if (firstMatch && secondMatch)
-                    {
-                        Thing newThing = ThingMaker.MakeThing(result);
-                        bool flag = billDoer.InspirationDef == InspirationDefOf.Inspired_Creativity;
-                        float count = GetAmountResult(Cultivation_Utility.realmListAll[level.def], modExtension.count.min, modExtension.count.max, flag);
-                        newThing.stackCount = modExtension.count.RandomInRange;
-                        CompItemGrade compItemGrade = newThing.TryGetComp<CompItemGrade>();
-                        if(compItemGrade != null)
+                        if (recipe == CTR_DefOf.CTR_MakeAlchemy)
                         {
-                            compItemGrade?.SetGrade(Cultivation_Utility.GenerateGradeCreatedByPawn(billDoer));
-                        }                        
-                        GenPlace.TryPlaceThing(newThing, billDoer.Position, billDoer.Map, ThingPlaceMode.Near);
-                        Messages.Message("mixing success! " + billDoer.LabelShort + " made a " + newThing.LabelCap, MessageTypeDefOf.PositiveEvent);
-                    }
-                    else
-                    {
-                        Thing newThing = ThingMaker.MakeThing(modExtension.failedProduct);
-                        newThing.stackCount = modExtension.count.RandomInRange;
-                        GenPlace.TryPlaceThing(newThing, billDoer.Position, billDoer.Map, ThingPlaceMode.Near);
-                        Messages.Message("mixing failed, no valid combination", MessageTypeDefOf.NeutralEvent);
+                            DoAlchemyRecipe(billDoer, level, false);
+                        }
+                        if (recipe == CTR_DefOf.CTR_MakeTalisman)
+                        {
+                            DoTalismanRecipe(billDoer, level,false);
+                        }
                     }
                 }
 
+                
             }
             else
             {
                 Messages.Message("mixing failed, user have insufficient cultivation", MessageTypeDefOf.NeutralEvent);
 
+            }
+        }
+
+        public void DoTalismanRecipe(Pawn billDoer, Hediff_CultivationBase level, bool foundMatch, RecipeCombination resultThing = null)
+        {
+            if (foundMatch)
+            {
+                Thing newThing = ThingMaker.MakeThing(resultThing.result);
+                bool flag = billDoer.InspirationDef == InspirationDefOf.Inspired_Creativity;
+                int count = 0;
+                if (modExtension.count != null)
+                {
+                    count = modExtension.count.RandomInRange;
+                }
+                else
+                {
+                    count = resultThing.count.RandomInRange;
+                }
+                if (count <= 0) count = 1;
+                newThing.stackCount = count;
+                CompItemGrade compItemGrade = newThing.TryGetComp<CompItemGrade>();
+                if (compItemGrade != null)
+                {
+                    compItemGrade?.SetGrade(Cultivation_Utility.GenerateGradeCreatedByPawn(billDoer));
+                }
+                GenPlace.TryPlaceThing(newThing, billDoer.Position, billDoer.Map, ThingPlaceMode.Near);
+                Messages.Message("mixing success! " + billDoer.LabelShort + " made a " + newThing.LabelCap, MessageTypeDefOf.PositiveEvent);
+            }
+            else
+            {
+                Thing newThing = ThingMaker.MakeThing(modExtension.failedProduct);
+                newThing.stackCount = modExtension.count.RandomInRange;
+                GenPlace.TryPlaceThing(newThing, billDoer.Position, billDoer.Map, ThingPlaceMode.Near);
+                Messages.Message("mixing failed, no valid combination", MessageTypeDefOf.NeutralEvent);
+            }
+        }
+        public void DoAlchemyGenericRecipe(Pawn billDoer, Hediff_CultivationBase level, bool foundMatch, RecipeCombination resultThing = null)
+        {
+            Thing workbench = GenRadial.RadialDistinctThingsAround(billDoer.Position, billDoer.MapHeld, 1.9f, true).
+                    Where(x => x.def == CTR_DefOf.CTR_AlchemyFurnace_Basic || x.def == CTR_DefOf.CTR_AlchemyFurnace_Intermediate).FirstOrDefault();
+            float furnaceQuality = workbench != null ? workbench.GetStatValue(CTR_DefOf.AlchemyFurnaceQuality) : 0f;
+            float chance = billDoer.GetStatValue(CTR_DefOf.AlchemySuccessChance) * furnaceQuality;
+            if (Rand.Chance(chance))
+            {
+                if (foundMatch)
+                {
+                    Thing newThing = ThingMaker.MakeThing(resultThing.result);
+                    bool flag = billDoer.InspirationDef == InspirationDefOf.Inspired_Creativity;
+                    int count = 0;
+                    if (modExtension.count != null)
+                    {
+                        count = modExtension.count.RandomInRange;
+                    }
+                    else
+                    {
+                        count = resultThing.count.RandomInRange;
+                    }
+                    if (count <= 0) count = 1;
+                    newThing.stackCount = count;
+                    GenPlace.TryPlaceThing(newThing, billDoer.Position, billDoer.Map, ThingPlaceMode.Near);
+                    Messages.Message("mixing success! " + billDoer.LabelShort + " made a " + newThing.LabelCap, MessageTypeDefOf.PositiveEvent);
+                }
+                else
+                {
+                    Thing newThing = ThingMaker.MakeThing(modExtension.failedProduct);
+                    newThing.stackCount = Rand.RangeInclusive(0,1);
+                    GenPlace.TryPlaceThing(newThing, billDoer.Position, billDoer.Map, ThingPlaceMode.Near);
+                    Messages.Message("mixing failed, no valid combination", MessageTypeDefOf.NeutralEvent);
+                }
+            }
+            else
+            {
+                Messages.Message($"mixing failed,{billDoer.LabelShort} pass the requirement but didn't pass success check. {chance.ToStringPercent("0.00")}", MessageTypeDefOf.NeutralEvent);
+            }
+        }
+        public void DoAlchemyRecipe(Pawn billDoer, Hediff_CultivationBase level, bool foundMatch, RecipeCombination resultThing = null)
+        {
+            Thing workbench = GenRadial.RadialDistinctThingsAround(billDoer.Position, billDoer.MapHeld, 1.9f, true).
+                    Where(x => x.def == CTR_DefOf.CTR_AlchemyFurnace_Basic || x.def == CTR_DefOf.CTR_AlchemyFurnace_Intermediate).FirstOrDefault();
+            float furnaceQuality = workbench != null ? workbench.GetStatValue(CTR_DefOf.AlchemyFurnaceQuality) : 0f;
+            float chance = billDoer.GetStatValue(CTR_DefOf.AlchemySuccessChance) * furnaceQuality;
+            if (Rand.Chance(chance))
+            {
+                if (foundMatch)
+                {
+                    Thing newThing = ThingMaker.MakeThing(resultThing.result);
+                    bool flag = billDoer.InspirationDef == InspirationDefOf.Inspired_Creativity;
+                    int count = 0;
+                    if (modExtension.count != null)
+                    {
+                        count = modExtension.count.RandomInRange;
+                    }
+                    else
+                    {
+                        count = resultThing.count.RandomInRange;
+                    }
+                    newThing.stackCount = count;
+                    if (newThing.def.tradeTags.Contains("CTR_Pill"))
+                    {
+                        newThing?.TryGetComp<CompPillGrade>()?.SetGrade(Cultivation_Utility.GeneratePillGradeCreatedByPawn(billDoer, level));
+                    }
+                    GenPlace.TryPlaceThing(newThing, billDoer.Position, billDoer.Map, ThingPlaceMode.Near);
+                    Messages.Message("mixing success! " + billDoer.LabelShort + " made a " + newThing.LabelCap, MessageTypeDefOf.PositiveEvent);
+                }
+                else
+                {
+                    Thing newThing = ThingMaker.MakeThing(modExtension.failedProduct);
+                    newThing.stackCount = modExtension.count.RandomInRange;
+                    GenPlace.TryPlaceThing(newThing, billDoer.Position, billDoer.Map, ThingPlaceMode.Near);
+                    Messages.Message("mixing failed, no valid combination", MessageTypeDefOf.NeutralEvent);
+                }
+            }
+            else
+            {
+                Messages.Message($"mixing failed,{billDoer.LabelShort} pass the requirement but didn't pass success check. {chance.ToStringPercent("0.00")}", MessageTypeDefOf.NeutralEvent);
             }
         }
         public static float GetAmountResult(int cultivationLevel, int min, int max, bool inspired)
@@ -202,5 +315,84 @@ namespace CultivatorOfTheRim
             return value;
         }
 
+        /*public void LegacyAlchemyMethod()
+        {
+            bool firstMatch = false;
+            bool secondMatch = false;
+            ThingDef result = null;
+            foreach (var item in modExtension.combinations)
+            {
+                if (ingredients[0].def.tradeTags.Contains(item.firstTag))
+                {
+                    firstMatch = true;
+                }
+                if (ingredients[1].def.tradeTags.Contains(item.secondTag))
+                {
+                    secondMatch = true;
+                }
+                if (firstMatch && secondMatch)
+                {
+                    result = item.result;
+                    break;
+                }
+                else
+                {
+                    firstMatch = false;
+                    secondMatch = false;
+                }
+
+            }
+            if (recipe == CTR_DefOf.CTR_MakeAlchemy)
+            {
+                float chance = billDoer.GetStatValue(CTR_DefOf.AlchemySuccessChance) * recipe.recipeUsers.FirstOrDefault().GetStatValueAbstract(CTR_DefOf.AlchemyFurnaceQuality);
+                if (Rand.Chance(chance))
+                {
+                    if (firstMatch && secondMatch)
+                    {
+                        Thing newThing = ThingMaker.MakeThing(result);
+                        bool flag = billDoer.InspirationDef == InspirationDefOf.Inspired_Creativity;
+                        float count = GetAmountResult(Cultivation_Utility.realmListAll[level.def], modExtension.count.min, modExtension.count.max, flag);
+                        newThing.stackCount = modExtension.count.RandomInRange;
+                        GenPlace.TryPlaceThing(newThing, billDoer.Position, billDoer.Map, ThingPlaceMode.Near);
+                        Messages.Message("mixing success! " + billDoer.LabelShort + " made a " + newThing.LabelCap, MessageTypeDefOf.PositiveEvent);
+                    }
+                    else
+                    {
+                        Thing newThing = ThingMaker.MakeThing(modExtension.failedProduct);
+                        newThing.stackCount = modExtension.count.RandomInRange;
+                        GenPlace.TryPlaceThing(newThing, billDoer.Position, billDoer.Map, ThingPlaceMode.Near);
+                        Messages.Message("mixing failed, no valid combination", MessageTypeDefOf.NeutralEvent);
+                    }
+                }
+                else
+                {
+                    Messages.Message($"mixing failed,{billDoer.LabelShort} pass the requirement but didn't pass success check. {chance.ToStringPercent("0.00")}", MessageTypeDefOf.NeutralEvent);
+                }
+            }
+            if (recipe == CTR_DefOf.CTR_MakeTalisman)
+            {
+                if (firstMatch && secondMatch)
+                {
+                    Thing newThing = ThingMaker.MakeThing(result);
+                    bool flag = billDoer.InspirationDef == InspirationDefOf.Inspired_Creativity;
+                    float count = GetAmountResult(Cultivation_Utility.realmListAll[level.def], modExtension.count.min, modExtension.count.max, flag);
+                    newThing.stackCount = modExtension.count.RandomInRange;
+                    CompItemGrade compItemGrade = newThing.TryGetComp<CompItemGrade>();
+                    if (compItemGrade != null)
+                    {
+                        compItemGrade?.SetGrade(Cultivation_Utility.GenerateGradeCreatedByPawn(billDoer));
+                    }
+                    GenPlace.TryPlaceThing(newThing, billDoer.Position, billDoer.Map, ThingPlaceMode.Near);
+                    Messages.Message("mixing success! " + billDoer.LabelShort + " made a " + newThing.LabelCap, MessageTypeDefOf.PositiveEvent);
+                }
+                else
+                {
+                    Thing newThing = ThingMaker.MakeThing(modExtension.failedProduct);
+                    newThing.stackCount = modExtension.count.RandomInRange;
+                    GenPlace.TryPlaceThing(newThing, billDoer.Position, billDoer.Map, ThingPlaceMode.Near);
+                    Messages.Message("mixing failed, no valid combination", MessageTypeDefOf.NeutralEvent);
+                }
+            }
+        }*/
     }
 }

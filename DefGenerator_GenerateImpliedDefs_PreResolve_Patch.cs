@@ -11,27 +11,19 @@ using Verse;
 
 namespace CultivatorOfTheRim
 {
-    public class CTR_SuperStartPatch : Mod
-    {
-        public CTR_SuperStartPatch(ModContentPack content) : base(content)
-        {
-            new Harmony("FarmerJoe.CultivatorOfTheRim").PatchAll();
-        }
-    }
-
-
     [HarmonyPatch(typeof(DefGenerator))]
     [HarmonyPatch("GenerateImpliedDefs_PreResolve")]
     public class DefGenerator_GenerateImpliedDefs_PreResolve_Patch
     {
-        private static void Postfix()
+        public static void Postfix()
         {
-            Log.Message("it work?");
+            //Log.Message("it work?");
             foreach (var item in DefDatabase<ThingDef>.AllDefsListForReading.Where(InjectQiType))
             {
                 if (item.category == ThingCategory.Item)
-                {
+                {                    
                     if (item.modContentPack != null && item.modContentPack?.PackageId == "aranmaho.xianxia") continue;
+                    if (item.isUnfinishedThing) continue;
 
                     StringBuilder stringBuilder = new StringBuilder();
                     stringBuilder.Append(item.description);
@@ -149,6 +141,20 @@ namespace CultivatorOfTheRim
                         tags += "Cold_Qi".Colorize(Color.cyan);
                         tags += ",";
                         tags += "Yin_Qi".Colorize(Color.cyan);
+                        tags += ",";
+                    }
+                    IEnumerable<string> nascent = new List<string>()
+                    {
+                        "moon","lunar"
+                    };
+                    if (nascent.Any(x => item.label.ToLower().Contains(x)))
+                    {
+                        if (item.tradeTags == null)
+                        {
+                            item.tradeTags = new List<string>();
+                        }
+                        item.tradeTags.Add("Nascent_Qi");
+                        tags += "Nascent_Qi".Colorize(Color.cyan);
                         tags += ",";
                     }
                     IEnumerable<string> celestial = new List<string>()

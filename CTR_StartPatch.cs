@@ -3,6 +3,7 @@ using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
 using Verse;
@@ -16,32 +17,51 @@ namespace CultivatorOfTheRim
         static CTR_StartPatch()
         {
             //new Harmony("FarmerJoe.CultivatorOfTheRim").PatchAll();
-            Log.Message("Finishing introducing cultivation to the rim");
-            Inject();
-            if(CultivatorOfTheRimMod.settings.severityMultiplier != 1.00f)
+            //Log.Message("Finishing introducing cultivation to the rim");
+            try
             {
-                AlterCultivatorRequirement(CultivatorOfTheRimMod.settings.severityMultiplier);
+                StartUpCollectionCached();
+                Inject();
+                ConfirmXmlPatchKey();
+                if (CultivatorOfTheRimMod.settings.severityMultiplier != 1.00f)
+                {
+                    AlterCultivatorRequirement(CultivatorOfTheRimMod.settings.severityMultiplier);
+                }
+                if (CultivatorOfTheRimMod.settings.isNerfingWorkSpeed)
+                {
+                    AlterWorkSpeedBoost();
+                }
+                if (CultivatorOfTheRimMod.settings.isNerfingCultivatorIDM)
+                {
+                    AlterIDM();
+                }
+                if (CultivatorOfTheRimMod.settings.isNerfBodyCultivatorMeleeDamage)
+                {
+                    AlterMeleeDamageBody();
+                }
+                if (CultivatorOfTheRimMod.settings.globalStatMultiplier != 1.00f)
+                {
+                    AlterStatMultiplier();
+                }
+                if (!CultivatorOfTheRimMod.settings.isAllowWildSpiritPlantSpawn)
+                {
+                    SuppressWildSpiritPlantSpawn();
+                }
+                if (CultivatorOfTheRimMod.settings.isSpiritGrassCanSupportItSelf)
+                {
+                    SpiritGrassPatching();
+                }
+                if (!ModsConfig.IsActive("zomuro.itssorcery"))
+                {
+                    StatDefMinCheck();
+                }
+                AutoAddingStats();
             }
-            if(CultivatorOfTheRimMod.settings.isNerfingWorkSpeed)
+            catch(Exception ex)
             {
-                AlterWorkSpeedBoost();
+                Log.Error($"[CTR] Error in {ex}");
             }
-            if(CultivatorOfTheRimMod.settings.isNerfingCultivatorIDM)
-            {
-                AlterIDM();
-            }
-            if(CultivatorOfTheRimMod.settings.isAddingCultivationTraderToFactionCaravan)
-            {
-                GiveFactionTrader(CultivatorOfTheRimMod.settings.isAddingCultivationTraderToFactionBase);
-            }
-            if(!CultivatorOfTheRimMod.settings.isAllowWildSpiritPlantSpawn)
-            {
-                SuppressWildSpiritPlantSpawn();
-            }
-            if(!ModsConfig.IsActive("zomuro.itssorcery"))
-            {
-                StatDefMinCheck();
-            }
+            
         }
         private static void StatDefMinCheck()
         {
@@ -53,24 +73,63 @@ namespace CultivatorOfTheRim
         }
         private static void SuppressWildSpiritPlantSpawn()
         {
-            IEnumerable<ThingDef> list = DefDatabase<ThingDef>.AllDefs.Where(IsSpiritPlant);
-            foreach(var item in list)
+            //IEnumerable<ThingDef> list = DefDatabase<ThingDef>.AllDefs.Where(IsSpiritPlant);
+            IEnumerable<BiomeDef> biomes = DefDatabase<BiomeDef>.AllDefs.ToList();
+            foreach (var item in biomes)
+            {
+                IReadOnlyList<BiomePlantRecord> bpr = item.wildPlants.ToList();
+                foreach (var item2 in bpr)
+                {
+                    if (item2.plant.modContentPack.PackageId == "aranmaho.xianxia")
+                    {
+                        item.wildPlants.Remove(item2);
+                    }
+                }
+            }
+            foreach (var item in DefDatabase<ThingDef>.AllDefsListForReading.Where(x => x.thingClass == typeof(Plant_SpiritPlant)))
+            {
+                if (item.plant.wildBiomes.NotNullOrEmpty())
+                {
+                    item.plant.wildBiomes.Clear();
+                }
+            }
+           /* foreach(var item in list)
             {
                 if(item.plant == null) continue;
                 if(item.plant.wildBiomes.NullOrEmpty()) continue;
                 item.plant.wildBiomes.Clear();
-            }
+            }*/
+        }
+
+        private static void SpiritGrassPatching()
+        {
+            CTR_DefOf.CTR_SpiritGrassPlant.GetModExtension<PlantExtension_SpiritPlant>().excludedThing.Clear();
         }
         private static void AlterCultivatorRequirement(float num)
         {
-            IEnumerable<HediffDef> list = DefDatabase<HediffDef>.AllDefs.Where(AlterPredicate);
-            foreach(HediffDef def in list)
+            IEnumerable<CultivationHediffDef> list = StaticCollectionCached.CultivationHediffDefs;
+            foreach(var def in list)
             {
-                def.maxSeverity *= num;
-                foreach(var item in def.stages)
+                try
                 {
-                    item.minSeverity *= num;
+                    def.maxSeverity *= num;
+                    foreach(var item in def.stages)
+                    {
+                        item.minSeverity *= num;
+                    }
+                    if (def.cultivationStages != null && def.cultivationStages.NotNullOrEmpty())
+                    {
+                        foreach (var culStage in def.cultivationStages)
+                        {
+                            culStage.minSeverity *= num;
+                        }
+                    }
                 }
+                catch (Exception ex)
+                {
+                    Log.Error($"[CTR] Error Alter cultivation requirement for {def}. {ex}");
+                }
+                
             }
         }
         public static void AlterIDM()
@@ -107,145 +166,261 @@ namespace CultivatorOfTheRim
                 }
             }
         }
+        public static void AutoAddingStats()
+        {
+            foreach (var item in StaticCollectionCached.CultivationHediffDefs)
+            {
+                if (item.hediffClass == typeof(Hediff_BodyCultivaton))
+                {
+                    if (item.realmPower >= 7)
+                    {
+                        foreach (var stage in item.stages)
+                        {
+                            StatModifier statMod = new StatModifier();
+                            statMod.stat = StatDefOf.InjuryHealingFactor;
+                            statMod.value = stage.naturalHealingFactor;
+                            stage.statOffsets.Add(statMod);
+                        }
+                    }
+                }
+            }
+        }
         public static void AlterWorkSpeedBoost()
         {
-            IEnumerable<HediffDef> list = DefDatabase<HediffDef>.AllDefs.Where(AlterPredicate);
-            foreach (HediffDef def in list)
+            //IEnumerable<HediffDef> list = DefDatabase<HediffDef>.AllDefs.Where(AlterPredicate);
+            foreach (var def in StaticCollectionCached.CultivationHediffDefs)
             {
-                int level = Cultivation_Utility.realmListAll[def];
-                foreach (var stage in def.stages)
+                try
                 {
-                    if (level >= 6 && level < 13)
+                    int level = def.realmPower;
+                    foreach (var stage in def.stages)
+                    {
+                        if (level >= 6 && level < 13)
+                        {
+                            foreach (var statOffset in stage.statOffsets)
+                            {
+                                if (statOffset.stat == StatDefOf.WorkSpeedGlobal)
+                                {
+                                    statOffset.value -= 2.25f;
+                                }
+                            }
+                        }
+                        else if (level >= 13 && level < 18)
+                        {
+                            foreach (var statOffset in stage.statOffsets)
+                            {
+                                if (statOffset.stat == StatDefOf.WorkSpeedGlobal)
+                                {
+                                    statOffset.value -= 2.50f;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            foreach (var statOffset in stage.statOffsets)
+                            {
+                                if (!stage.multiplyStatChangesBySeverity)
+                                {
+                                    continue;
+                                }
+                                if (statOffset.stat == StatDefOf.WorkSpeedGlobal)
+                                {
+                                    statOffset.value -= 0.03f;
+                                }
+                            }
+                        }
+                        /*foreach (var cap in stage.capMods)
+                        {
+                            if(level < 13)
+                            {
+                                if (cap.capacity == PawnCapacityDefOf.Manipulation)
+                                {
+                                    float numTemp = cap.postFactor;
+                                    cap.postFactor = 1f;
+                                    cap.offset = (numTemp - 1f) * 0.5f;
+                                }
+                                if (cap.capacity == PawnCapacityDefOf.Sight)
+                                {
+                                    float numTemp = cap.postFactor;
+                                    cap.postFactor = 1f;
+                                    cap.offset = (numTemp - 1f) * 0.5f;
+                                }
+                            }
+                            else if(level >= 13 && level < 14)
+                            {
+                                if (cap.capacity == PawnCapacityDefOf.Manipulation)
+                                {
+                                    float numTemp = cap.postFactor;
+                                    cap.postFactor = 1f;
+                                    cap.offset = (numTemp - 1f) * 0.45f;
+                                }
+                                if (cap.capacity == PawnCapacityDefOf.Sight)
+                                {
+                                    float numTemp = cap.postFactor;
+                                    cap.postFactor = 1f;
+                                    cap.offset = (numTemp - 1f) * 0.45f;
+                                }
+                            }
+                            else if(level >= 14 && level < 15)
+                            {
+                                if (cap.capacity == PawnCapacityDefOf.Manipulation)
+                                {
+                                    float numTemp = cap.postFactor;
+                                    cap.postFactor = 1f;
+                                    cap.offset = (numTemp - 1f) * 0.425f;
+                                }
+                                if (cap.capacity == PawnCapacityDefOf.Sight)
+                                {
+                                    float numTemp = cap.postFactor;
+                                    cap.postFactor = 1f;
+                                    cap.offset = (numTemp - 1f) * 0.425f;
+                                }
+                            }
+                            else if(level >= 15 && level < 18)
+                            {
+                                if (cap.capacity == PawnCapacityDefOf.Manipulation)
+                                {
+                                    float numTemp = cap.postFactor;
+                                    cap.postFactor = 1f;
+                                    cap.offset = (numTemp - 1f) * 0.425f;
+                                }
+                                if (cap.capacity == PawnCapacityDefOf.Sight)
+                                {
+                                    float numTemp = cap.postFactor;
+                                    cap.postFactor = 1f;
+                                    cap.offset = (numTemp - 1f) * 0.425f;
+                                }
+                            }
+                            else if (level >= 18)
+                            {
+                                if (cap.capacity == PawnCapacityDefOf.Manipulation)
+                                {
+                                    float numTemp = cap.postFactor;
+                                    cap.postFactor = 1f;
+                                    cap.offset = (numTemp - 1f) * 0.25f;
+                                }
+                                if (cap.capacity == PawnCapacityDefOf.Sight)
+                                {
+                                    float numTemp = cap.postFactor;
+                                    cap.postFactor = 1f;
+                                    cap.offset = (numTemp - 1f) * 0.25f;
+                                }
+                            }
+                        }*/
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"[CTR] Error patching workspeed for {def}. {ex}");
+                }
+
+            }
+        }
+
+        public static void AlterMeleeDamageBody()
+        {
+            foreach (var item in StaticCollectionCached.CultivationHediffDefs.Where(x => x.IsBodyCultivation()))
+            {
+                try
+                {
+                    foreach (var stage in item.stages)
                     {
                         foreach (var statOffset in stage.statOffsets)
                         {
-                            if (statOffset.stat == StatDefOf.WorkSpeedGlobal)
+                            if (statOffset.stat == StatDefOf.MeleeDamageFactor)
                             {
-                                statOffset.value -= 2.25f;
-                            }
-                        }
-                    }
-                    else if(level >= 13 && level < 18)
-                    {
-                        foreach (var statOffset in stage.statOffsets)
-                        {
-                            if (statOffset.stat == StatDefOf.WorkSpeedGlobal)
-                            {
-                                statOffset.value -= 2.50f;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        foreach (var statOffset in stage.statOffsets)
-                        {
-                            if(!stage.multiplyStatChangesBySeverity)
-                            {
-                                continue;
-                            }
-                            if (statOffset.stat == StatDefOf.WorkSpeedGlobal)
-                            {
-                                statOffset.value -= 0.03f;
-                            }
-                        }
-                    }
-                    foreach (var cap in stage.capMods)
-                    {
-                        if(level < 13)
-                        {
-                            if (cap.capacity == PawnCapacityDefOf.Manipulation)
-                            {
-                                float numTemp = cap.postFactor;
-                                cap.postFactor = 1f;
-                                cap.offset = numTemp * 0.5f;
-                            }
-                            if (cap.capacity == PawnCapacityDefOf.Sight)
-                            {
-                                float numTemp = cap.postFactor;
-                                cap.postFactor = 1f;
-                                cap.offset = numTemp * 0.5f;
-                            }
-                        }
-                        else if(level >= 13 && level < 14)
-                        {
-                            if (cap.capacity == PawnCapacityDefOf.Manipulation)
-                            {
-                                float numTemp = cap.postFactor;
-                                cap.postFactor = 1f;
-                                cap.offset = numTemp * 0.45f;
-                            }
-                            if (cap.capacity == PawnCapacityDefOf.Sight)
-                            {
-                                float numTemp = cap.postFactor;
-                                cap.postFactor = 1f;
-                                cap.offset = numTemp * 0.45f;
-                            }
-                        }
-                        else if(level >= 14 && level < 15)
-                        {
-                            if (cap.capacity == PawnCapacityDefOf.Manipulation)
-                            {
-                                float numTemp = cap.postFactor;
-                                cap.postFactor = 1f;
-                                cap.offset = numTemp * 0.425f;
-                            }
-                            if (cap.capacity == PawnCapacityDefOf.Sight)
-                            {
-                                float numTemp = cap.postFactor;
-                                cap.postFactor = 1f;
-                                cap.offset = numTemp * 0.425f;
-                            }
-                        }
-                        else if(level >= 15 && level < 18)
-                        {
-                            if (cap.capacity == PawnCapacityDefOf.Manipulation)
-                            {
-                                float numTemp = cap.postFactor;
-                                cap.postFactor = 1f;
-                                cap.offset = numTemp * 0.425f;
-                            }
-                            if (cap.capacity == PawnCapacityDefOf.Sight)
-                            {
-                                float numTemp = cap.postFactor;
-                                cap.postFactor = 1f;
-                                cap.offset = numTemp * 0.425f;
-                            }
-                        }
-                        else if (level >= 18)
-                        {
-                            if (cap.capacity == PawnCapacityDefOf.Manipulation)
-                            {
-                                float numTemp = cap.postFactor;
-                                cap.postFactor = 1f;
-                                cap.offset = numTemp * 0.25f;
-                            }
-                            if (cap.capacity == PawnCapacityDefOf.Sight)
-                            {
-                                float numTemp = cap.postFactor;
-                                cap.postFactor = 1f;
-                                cap.offset = numTemp * 0.25f;
+                                statOffset.value *= CultivatorOfTheRimMod.settings.MeleeDamageMultiplier;
                             }
                         }
                     }
                 }
-                
-                
+                catch(Exception ex) 
+                {
+                    Log.Error($"[CTR] Error patching melee damage for {item}. {ex}");
+                }
             }
         }
-        private static void GiveFactionTrader(bool alsoGiveToFactionBase)
-        {
-            IEnumerable<FactionDef> list = DefDatabase<FactionDef>.AllDefs.Where(FactionPredicate);
-            foreach(var item in list)
-            {
-                item.caravanTraderKinds.Add(CTR_DefOf.Caravan_CultivationResource);
-                item.caravanTraderKinds.Add(CTR_DefOf.Caravan_CultivationPill);
-                item.caravanTraderKinds.Add(CTR_DefOf.Caravan_CultivationTechnique);
 
-                if(alsoGiveToFactionBase)
+        public static void AlterStatMultiplier()
+        {
+            float mul = CultivatorOfTheRimMod.settings.globalStatMultiplier;
+            foreach (var item in StaticCollectionCached.CultivationHediffDefs)
+            {
+                try
                 {
-                    item.baseTraderKinds.Add(CTR_DefOf.Caravan_CultivationResource);
-                    item.baseTraderKinds.Add(CTR_DefOf.Caravan_CultivationPill);
-                    item.baseTraderKinds.Add(CTR_DefOf.Caravan_CultivationTechnique);
+                    foreach (var stage in item.stages)
+                    {
+                        if (stage.statOffsets.NotNullOrEmpty())
+                        {
+                            foreach (var statOffset in stage.statOffsets)
+                            {
+                                statOffset.value *= mul;
+                            }
+                        }
+                        if (stage.statFactors.NotNullOrEmpty())
+                        {
+                            foreach (var factor in stage.statFactors)
+                            {
+                                float num = factor.value;
+                                num -= 1f;
+                                num *= mul;
+                                factor.value = 1f + num;
+                            }
+                        }
+                        if (stage.capMods.NotNullOrEmpty())
+                        {
+                            foreach (var capMod in stage.capMods)
+                            {
+                                if (capMod.offset != 0)
+                                {
+                                    capMod.offset *= mul;
+                                }
+                                if (capMod.postFactor != 1)
+                                {
+                                    float num = capMod.postFactor;
+                                    num -= 1f;
+                                    num *= mul;
+                                    capMod.postFactor = 1f + num;
+
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"[CTR] Error patching stat multiplier for {item}. {ex}");
+                }
+            }
+        }
+        private static void ConfirmXmlPatchKey()
+        {
+            if (CultivatorOfTheRimMod.settings.settingKey.NullOrEmpty())
+            {
+                CultivatorOfTheRimMod.settings.settingKey = [];
+            }
+
+            if (CultivatorOfTheRimMod.settings.isAddingCultivationTraderToFactionCaravan)
+            {
+                if (!CultivatorOfTheRimMod.settings.settingKey.Contains("CTR.CaravanTraderKind"))
+                {
+                    CultivatorOfTheRimMod.settings.settingKey.AddDistinct("CTR.CaravanTraderKind");
+                }
+            }
+            
+            if (CultivatorOfTheRimMod.settings.isAddingCultivationTraderToFactionBase)
+            {
+                if (!CultivatorOfTheRimMod.settings.settingKey.Contains("CTR.BaseTraderKind"))
+                {
+                    CultivatorOfTheRimMod.settings.settingKey.AddDistinct("CTR.BaseTraderKind");
+                }
+            }
+
+            if (CultivatorOfTheRimMod.settings.isSpiritPlantGrowAnywhere)
+            {
+                if (!CultivatorOfTheRimMod.settings.settingKey.Contains("CTR.SpiritPlantGrowAnywhere"))
+                {
+                    CultivatorOfTheRimMod.settings.settingKey.AddDistinct("CTR.SpiritPlantGrowAnywhere");
                 }
             }
         }
@@ -461,7 +636,7 @@ namespace CultivatorOfTheRim
             }*/
 
             //add recipe info to mixing
-            foreach (var item in DefDatabase<RecipeDef>.AllDefsListForReading.Where(x => x == CTR_DefOf.CTR_MakeAlchemy || x == CTR_DefOf.CTR_MakeTalisman))
+            foreach (var item in DefDatabase<RecipeDef>.AllDefsListForReading.Where(x => x == CTR_DefOf.CTR_MakeAlchemy || x == CTR_DefOf.CTR_MakeTalisman || x == CTR_DefOf.CTR_MakeAlchemy_Generic))
             {
                 if(item == CTR_DefOf.CTR_MakeAlchemy)
                 {
@@ -496,7 +671,25 @@ namespace CultivatorOfTheRim
                     }
                     item.description = stringBuilder.ToString().TrimEndNewlines();
                 }
+                else if (item == CTR_DefOf.CTR_MakeAlchemy_Generic)
+                {
+                    StringBuilder stringBuilder = new StringBuilder();
+                    stringBuilder.Append(item.description);
+                    stringBuilder.AppendLine();
+                    stringBuilder.AppendLine("recipe list");
+                    stringBuilder.AppendLine();
+                    foreach (var recipe in item.GetModExtension<RecipeExtension_MixingIngredient>().combinations)
+                    {
+                        stringBuilder.AppendLine("first thing: ".Colorize(Color.green) + recipe.firstThing.LabelCap);
+                        stringBuilder.AppendLine("second thing: ".Colorize(Color.green) + recipe.secondThing.LabelCap);
+                        stringBuilder.AppendLine("result: ".Colorize(Color.green) + recipe.result.label);
+                        stringBuilder.AppendLine();
+                    }
+                    item.description = stringBuilder.ToString().TrimEndNewlines();
+                }
             }
+
+            
         }
         private static bool CTRStatDefPredicate(StatDef def)
         {
@@ -513,11 +706,15 @@ namespace CultivatorOfTheRim
 
         private static bool AlterPredicate(HediffDef def)
         {
-            if(def.tags.NullOrEmpty())
+            /*if (def.hediffClass == typeof(Hediff_CultivationLevel))
+            {
+                return true;
+            }*/
+            if (def.tags.NullOrEmpty())
             {
                 return false;
             }
-            if(!def.tags.Contains("CTR_Realm"))
+            if (!def.tags.Contains("CTR_Realm"))
             {
                 return false;
             }
@@ -562,10 +759,13 @@ namespace CultivatorOfTheRim
             {
                 return true;
             }
-            if(def.thingClass == typeof(Apparel) || def.thingClass.IsSubclassOf(typeof(Apparel)))
+            if (def.thingClass != null)
             {
-                return true;
-            }
+                if (def.thingClass == typeof(Apparel) || def.thingClass.IsSubclassOf(typeof(Apparel)))
+                {
+                    return true;
+                }
+            }            
             /*if (!def.HasComp(typeof(CompQuality)))
             {
                 return false;
@@ -596,6 +796,17 @@ namespace CultivatorOfTheRim
                 return false;
             }
             return true;
+        }
+
+        public static void StartUpCollectionCached()
+        {
+            StaticCollectionCached.FactionCultivationDef.AddRange(DefDatabase<FactionCultivationDef>.AllDefsListForReading);
+            StaticCollectionCached.CultivationHediffDefs.AddRange(DefDatabase<CultivationHediffDef>.AllDefsListForReading);
+            foreach (var item in StaticCollectionCached.CultivationHediffDefs)
+            {
+                StaticCollectionCached.CultivationRealmPower.Add(item, item.realmPower);
+                StaticCollectionCached.CultivationRealmWeight.Add(item, item.realmWeight);
+            }
         }
     }
 

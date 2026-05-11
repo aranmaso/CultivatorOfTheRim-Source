@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using Verse;
 
 namespace CultivatorOfTheRim
@@ -50,9 +51,20 @@ namespace CultivatorOfTheRim
         public int activeDelay = 300;
 
         public string uiIcon;
+        
+        public Texture2D _uiIcon;
         public CompProperties_Formation() 
         {
             compClass = typeof(CompFormation);
+        }
+
+        public override void ResolveReferences(ThingDef parentDef)
+        {
+            base.ResolveReferences(parentDef);
+            LongEventHandler.ExecuteWhenFinished(delegate
+            {
+                _uiIcon = ContentFinder<Texture2D>.Get(uiIcon);
+            });
         }
     }
 }

@@ -16,7 +16,9 @@ namespace CultivatorOfTheRim
 {
     public class HediffComp_Cultivation : HediffComp
     {
-        private HediffCompProperties_Cultivation Props => (HediffCompProperties_Cultivation)props;
+        public HediffCompProperties_Cultivation Props => (HediffCompProperties_Cultivation)props;
+        public Hediff_CultivationBase cultivationBase => parent as Hediff_CultivationBase;
+        public CultivationHediffDef CulDef => cultivationBase.cultivationDef;
 
         private List<NeedListInfoInner> NeedListCached = new List<NeedListInfoInner>();
 
@@ -43,7 +45,7 @@ namespace CultivatorOfTheRim
             {
                 if(requireQiSource)
                 {
-                    int value = Cultivation_Utility.realmListAll[Def];
+                    int value = CulDef.realmPower;
                     if (value >= 7)
                     {
                         return true;
@@ -59,7 +61,7 @@ namespace CultivatorOfTheRim
             {
                 if(CultivatorOfTheRimMod.settings.isDeAgingPawn)
                 {
-                    return Cultivation_Utility.realmListAll[Def] >= 7;
+                    return CulDef.realmPower >= 7;
                 }
                 return false;
             }
@@ -71,7 +73,7 @@ namespace CultivatorOfTheRim
         {
             get
             {
-                return Cultivation_Utility.realmListAll[Def];
+                return CulDef.realmPower;
             }
         }
 
@@ -102,6 +104,18 @@ namespace CultivatorOfTheRim
             interval = Props.tickInterval;
             requireQiSource = Props.requireQiSource;
         }
+
+        public override void CompPostPostAdd(DamageInfo? dinfo)
+        {
+            base.CompPostPostAdd(dinfo);
+            ApplyBonusHediff();
+            //UpdateHealthScaleCache();
+        }
+        public override void CompPostPostRemoved()
+        {
+            base.CompPostPostRemoved();
+            //StaticCollectionCached.PawnHealthScaleCached.Remove(Pawn);
+        }
         public override void CompExposeData()
         {
             base.CompExposeData();
@@ -114,21 +128,31 @@ namespace CultivatorOfTheRim
             Scribe_Values.Look(ref CultivationSpeed, "CultivationSpeed", 1f);
             if(Props.requireQiSource)
             {
-                if(!QiSourceList.NullOrEmpty())
+                if (Scribe.mode == LoadSaveMode.PostLoadInit)
                 {
-                    Scribe_Collections.Look(ref QiSourceList, "QiSourceList", LookMode.Reference);
-                }               
-                if(!QiSourceWithType.NullOrEmpty())
-                {
-                    Scribe_Collections.Look(ref QiSourceWithType, "QiSourceWithType", LookMode.Reference, LookMode.Value);
-                }
-                if(!QiSourceWithValue.NullOrEmpty())
-                {
-                    Scribe_Collections.Look(ref QiSourceWithValue, "QiSourceWithValue", LookMode.Reference, LookMode.Value);
-                }
-                if (!QisourceTypeWithStringCached.NullOrEmpty())
-                {
-                    Scribe_Collections.Look(ref QisourceTypeWithStringCached, "QisourceTypeWithStringCached", LookMode.Reference, LookMode.Value);
+                    if (!QiSourceList.NullOrEmpty())
+                    {
+                        QiSourceList.Clear();
+                    }
+                    if (!QiSourceWithType.NullOrEmpty())
+                    {
+                        QiSourceWithType.Clear();
+                    }
+                    if (!QiSourceWithValue.NullOrEmpty())
+                    {
+                        QiSourceWithValue.Clear();
+                    }
+                    if (!QisourceTypeWithStringCached.NullOrEmpty())
+                    {
+                        QisourceTypeWithStringCached.Clear();
+                    }
+                    if (!itemToSpawnFleckList.NullOrEmpty())
+                    {
+                        itemToSpawnFleckList.Clear();
+                    }
+                    multiplierForQiType = 1f;
+                    totalSeverityChange = 0f;
+                    isInitialChecked = false;
                 }
             }
         }
@@ -148,11 +172,12 @@ namespace CultivatorOfTheRim
                 return NeedListCached;
             }
         }
-        public override void CompPostTick(ref float severityAdjustment)
+
+        public override void CompPostTickInterval(ref float severityAdjustment, int delta)
         {
-            if (Pawn.IsHashIntervalTick(250))
+            base.CompPostTickInterval(ref severityAdjustment, delta);
+            if (Pawn.IsHashIntervalTick(250,delta))
             {
-                HealthScaleMul = Pawn.GetStatValue(CTR_DefOf.CTR_HealthMultiplier);
                 //Log.Message("get new Health Scale: " + HealthScaleMul);                
                 CultivationSpeed = Pawn.GetStatValue(CTR_DefOf.CultivationSpeed);
                 //Log.Message("get new Cul Speed: " + CultivationSpeed);
@@ -161,20 +186,20 @@ namespace CultivatorOfTheRim
             {
                 return;
             }
-            if(Pawn.IsHashIntervalTick(60000))
+            if (Pawn.IsHashIntervalTick(60000, delta))
             {
-                if(isFixedAge)
+                if (isFixedAge)
                 {
-                    if(Pawn.ageTracker.AgeBiologicalYears > 21)
+                    if (Pawn.ageTracker.AgeBiologicalYears > 21)
                     {
                         Pawn.ageTracker.AgeBiologicalTicks = 75600000;
                         parent.pawn.ageTracker.ResetAgeReversalDemand(Pawn_AgeTracker.AgeReversalReason.ViaTreatment);
                     }
                 }
             }
-            if(Pawn.RaceProps.Humanlike)
+            if (Pawn.RaceProps.Humanlike)
             {
-                if(!Pawn.Spawned)
+                if (!Pawn.Spawned)
                 {
                     if (isInitialChecked)
                     {
@@ -192,7 +217,7 @@ namespace CultivatorOfTheRim
                     }
                     return;
                 }
-                if (parent.pawn.IsHashIntervalTick(interval) && parent.Severity < parent.def.maxSeverity)
+                if (parent.pawn.IsHashIntervalTick(interval, delta) && parent.Severity < parent.def.maxSeverity)
                 {
                     if (Pawn.story?.traits?.GetTrait(CTR_DefOf.CTR_CultivationProdigy) != null || Pawn.story.AllBackstories.Contains(CTR_DefOf.CTR_ImmortalChild))
                     {
@@ -246,13 +271,13 @@ namespace CultivatorOfTheRim
                 }
                 if (requireQiSource && parent.Severity < parent.def.maxSeverity && CultivatorOfTheRimMod.settings.isCulSpeedAffectedByEnviaronment)
                 {
-                    if (parent.pawn.IsHashIntervalTick(2500))
+                    if (parent.pawn.IsHashIntervalTick(2500, delta))
                     {
                         if (parent.pawn.psychicEntropy.IsCurrentlyMeditating && isNearbyQi)
                         {
                             UpdateSourceList();
                         }
-                        else if (!parent.pawn.psychicEntropy.IsCurrentlyMeditating && !QiSourceList.NullOrEmpty())
+                        else if (!Pawn.psychicEntropy.IsCurrentlyMeditating && !QiSourceList.NullOrEmpty())
                         {
                             QiSourceList.Clear();
                             QiSourceWithType.Clear();
@@ -264,7 +289,7 @@ namespace CultivatorOfTheRim
                             isInitialChecked = false;
                         }
                     }
-                    if (Pawn.IsHashIntervalTick(250))
+                    if (Pawn.IsHashIntervalTick(250, delta))
                     {
                         if (Pawn.psychicEntropy.IsCurrentlyMeditating)
                         {
@@ -281,24 +306,32 @@ namespace CultivatorOfTheRim
                 }
                 if (parent.Severity < parent.def.maxSeverity)
                 {
-                    if (isSpawningFleck && Pawn.psychicEntropy.IsCurrentlyMeditating)
+                    if (CultivatorOfTheRimMod.settings.isSpawnQiFleck)
                     {
-                        if (Pawn.IsHashIntervalTick(tickTillNextFleck))
+                        if (isSpawningFleck && Pawn.psychicEntropy.IsCurrentlyMeditating)
                         {
-                            if (!QiSourceList.NullOrEmpty())
+                            if (Pawn.IsHashIntervalTick(tickTillNextFleck, delta))
                             {
-                                SpawnOrb();
+                                if (!QiSourceList.NullOrEmpty())
+                                {
+                                    SpawnOrb();
+                                }
                             }
                         }
-                    }
-                    else if (!Pawn.psychicEntropy.IsCurrentlyMeditating && isSpawningFleck)
+                        else if (!Pawn.psychicEntropy.IsCurrentlyMeditating && isSpawningFleck)
+                        {
+                            isSpawningFleck = false;
+                            itemToSpawnFleckList.Clear();
+                        }
+                    }   
+                    else
                     {
                         isSpawningFleck = false;
                         itemToSpawnFleckList.Clear();
                     }
                 }
-            } 
-            if(Pawn.RaceProps.Animal || Pawn.RaceProps.IsAnomalyEntity)
+            }
+            if (Pawn.RaceProps.Animal || Pawn.RaceProps.IsAnomalyEntity)
             {
                 if (CultivatorOfTheRimMod.settings.isWildAnimalAutoCultivate)
                 {
@@ -308,7 +341,7 @@ namespace CultivatorOfTheRim
                         {
                             if (Pawn.Faction == Faction.OfPlayer)
                             {
-                                if (parent.pawn.IsHashIntervalTick(interval))
+                                if (parent.pawn.IsHashIntervalTick(interval, delta))
                                 {
                                     AnimalCultivate();
                                 }
@@ -316,7 +349,7 @@ namespace CultivatorOfTheRim
                         }
                         else
                         {
-                            if (parent.pawn.IsHashIntervalTick(interval))
+                            if (parent.pawn.IsHashIntervalTick(interval, delta))
                             {
                                 AnimalCultivate();
                             }
@@ -326,7 +359,7 @@ namespace CultivatorOfTheRim
                 }
                 if (CultivatorOfTheRimMod.settings.isColonyAnimalAutoBreakthrough)
                 {
-                    if (Pawn.IsHashIntervalTick(interval))
+                    if (Pawn.IsHashIntervalTick(250, delta))
                     {
                         if (parent.Severity >= parent.def.maxSeverity)
                         {
@@ -355,7 +388,7 @@ namespace CultivatorOfTheRim
                 }
                 if (CultivatorOfTheRimMod.settings.isWildAnimalAutoBreakthrought)
                 {
-                    if (Pawn.IsHashIntervalTick(interval))
+                    if (Pawn.IsHashIntervalTick(250, delta))
                     {
                         if (Pawn.Faction != Faction.OfPlayer)
                         {
@@ -382,9 +415,9 @@ namespace CultivatorOfTheRim
                         }
                     }
                 }
-            }                                         
+            }
 
-            if (parent.pawn.IsHashIntervalTick(2500) && CultivatorOfTheRimMod.settings.isNeedCapped)
+            if (parent.pawn.IsHashIntervalTick(2500, delta) && CultivatorOfTheRimMod.settings.isNeedCapped)
             {
                 if (NeedsGet != null && !changeToNeedsEmptyCached)
                 {
@@ -397,12 +430,38 @@ namespace CultivatorOfTheRim
                         }
                     }
                 }
-            }            
-            
+            }
         }
 
+        public override void Notify_Spawned()
+        {
+            base.Notify_Spawned();
+        }
+        
+        public void ApplyBonusHediff()
+        {
+            if (!Props.bonusHediff.NullOrEmpty())
+            {
+                foreach (var item in Props.bonusHediff.OrderBy(x => x.chance))
+                {
+                    if (Pawn.health.hediffSet.HasHediff(item.hediffDef)) continue;
+                    if (Rand.Chance(item.chance))
+                    {
+                        Hediff hediff = HediffMaker.MakeHediff(item.hediffDef, Pawn);
+                        Pawn.health.AddHediff(hediff);
+                        if (item.onlyOne)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
         public override void Notify_PawnDied(DamageInfo? dinfo, Hediff culprit = null)
-        {            
+        {
+            if (!Pawn.Dead) return;
+            if(Pawn.Corpse == null) return;
+            if(!Pawn.Corpse.Spawned) return;
             if((Pawn.RaceProps.Animal || Pawn.RaceProps.IsAnomalyEntity) && CultivatorOfTheRimMod.settings.isAnimalDropBeastCore)
             {
                 Map map = parent?.pawn?.Corpse?.Map;
@@ -414,9 +473,40 @@ namespace CultivatorOfTheRim
                     {
                         specialDrop.TryGetComp<CompBeastCore>().ownerName = Pawn.LabelShort;
                         specialDrop.TryGetComp<CompBeastCore>().ownerDef = Pawn.def;
-                        specialDrop.TryGetComp<CompBeastCore>().ownerCultivation = Def;
+                        specialDrop.TryGetComp<CompBeastCore>().ownerCultivation = CulDef;
                     }
                     GenSpawn.Spawn(specialDrop, pos, map);
+                }
+            }
+            else if (Pawn.RaceProps.Humanlike)
+            {
+                Map map = parent?.pawn?.Corpse?.Map;
+                IntVec3 pos = parent.pawn.Corpse.Position;
+                if (map != null)
+                {
+                    int level = CulDef.realmPower;
+                    if (level >= 7 && level < 14)
+                    {
+                        Thing specialDrop = ThingMaker.MakeThing(CTR_DefOf.CTR_GoldenCore_Core);
+                        if (specialDrop.TryGetComp<CompBeastCore>() != null)
+                        {
+                            specialDrop.TryGetComp<CompBeastCore>().ownerName = Pawn.LabelShort;
+                            specialDrop.TryGetComp<CompBeastCore>().ownerDef = Pawn.def;
+                            specialDrop.TryGetComp<CompBeastCore>().ownerCultivation = CulDef;
+                        }
+                        GenSpawn.Spawn(specialDrop, pos, map);
+                    }
+                    if (level >= 14)
+                    {
+                        Thing specialDrop = ThingMaker.MakeThing(CTR_DefOf.CTR_ImmortalCore);
+                        if (specialDrop.TryGetComp<CompBeastCore>() != null)
+                        {
+                            specialDrop.TryGetComp<CompBeastCore>().ownerName = Pawn.LabelShort;
+                            specialDrop.TryGetComp<CompBeastCore>().ownerDef = Pawn.def;
+                            specialDrop.TryGetComp<CompBeastCore>().ownerCultivation = CulDef;
+                        }
+                        GenSpawn.Spawn(specialDrop, pos, map);
+                    }
                 }
             }
         }
@@ -433,14 +523,17 @@ namespace CultivatorOfTheRim
                 }
             }
             if(!itemToSpawnFleckList.NullOrEmpty())
-            {
-                Vector3 tempItem = itemToSpawnFleckList.First().Key;
-                float num = QiSourceWithValue[itemToSpawnFleckList.First().Value];
-                num *= 2f;
-                SpawnQiOrbColor(Cultivation_Utility.getItemQiTier(itemToSpawnFleckList.First().Value),QisourceTypeWithStringCached[itemToSpawnFleckList.First().Value], tempItem);
-                //Cultivation_Utility.ThrowObjectAt(Pawn.Map, tempItem, Pawn.DrawPos, GetQiOrbType(QiSourceWithValue.First().Key), 0.25f + num, 0.25f + num);
+            {                
+                Thing tempItem = itemToSpawnFleckList.First().Value;
+                Vector3 origin = itemToSpawnFleckList.FirstOrDefault().Key;
+                string tier = Cultivation_Utility.getItemQiTier(tempItem);
+                string type = QisourceTypeWithStringCached.ContainsKey(tempItem) ? QisourceTypeWithStringCached[tempItem] : "Neutral_Qi";
+                if (Find.CameraDriver.InViewOf(Pawn))
+                {
+                    SpawnQiOrbColor(tier, type, origin);
+                }
                 amountSpawned++;
-                itemToSpawnFleckList.Remove(itemToSpawnFleckList.First().Key);
+                itemToSpawnFleckList.Remove(origin);
                 if (amountSpawned >= amountToSpawn)
                 {
                     itemToSpawnFleckList.Clear();
@@ -467,30 +560,34 @@ namespace CultivatorOfTheRim
                     }
                 }
             }
-            foreach (var item in QiSourceList)
+
+            for (var i = 0; i < QiSourceList.Count; i++)
             {
-                if(item.DestroyedOrNull())
+                var item = QiSourceList[i];
+                if (item.DestroyedOrNull())
                 {
                     continue;
                 }
+
                 //SpawnQiOrbColor(item);
                 CompQiStorage comps = item.TryGetComp<CompQiStorage>();
-                if(comps != null && comps.curStored > 0)
+                if (comps != null && comps.curStored > 0)
                 {
                     comps.DistributeQi(QiSourceWithValue[item]);
                 }
+
                 if (item.def.useHitPoints && !item.def.tradeTags.Contains("Unlimited_Source"))
                 {
                     /*MoteMovingToPoint moteMovingToPoint = (MoteMovingToPoint)ThingMaker.MakeThing(CTR_DefOf.CTR_AbsorbQiOrb);
                     moteMovingToPoint.Attach(item, Pawn);
-                    moteMovingToPoint.exactPosition = item.DrawPos;                  
+                    moteMovingToPoint.exactPosition = item.DrawPos;
                     moteMovingToPoint.exactRotation = item.DrawPos.AngleToFlat(Pawn.DrawPos) + 90f;
-                    GenPlace.TryPlaceThing(moteMovingToPoint, item.Position, Pawn.Map,ThingPlaceMode.Direct);*/                                                   
+                    GenPlace.TryPlaceThing(moteMovingToPoint, item.Position, Pawn.Map,ThingPlaceMode.Direct);*/
                     if (item.stackCount <= 1)
                     {
                         //item.TakeDamage(dinfo);
                         item.HitPoints--;
-                        if(item?.HitPoints <= 0)
+                        if (item?.HitPoints <= 0)
                         {
                             item?.Destroy();
                         }
@@ -512,9 +609,7 @@ namespace CultivatorOfTheRim
                             item.stackCount--;
                             item.HitPoints = item.MaxHitPoints;
                         }
-
                     }
-
                 }
                 /*float num = 6f * 6f;
                 if (item.DestroyedOrNull() || item.Position.DistanceToSquared(Pawn.Position) > num)
@@ -534,7 +629,7 @@ namespace CultivatorOfTheRim
                 {
                     item?.Destroy();
                 }*/
-            }            
+            }
         }
         public FleckDef GetQiOrbType(string item)
         {
@@ -573,10 +668,11 @@ namespace CultivatorOfTheRim
         }
         public void CheckForItemChange()
         {
+            //List<string> st = new List<string>() { "a","b","c","d"};
             IReadOnlyList<Thing> crystalList = new List<Thing>(QiCrystalList);
-            for(int i = 0;i < crystalList.Count - 1;i++)
+            for(int i = 0;i < crystalList.Count;i++)
             {
-                Thing tempThing = QiSourceList[i];                
+                Thing tempThing = crystalList[i];                
                 if (tempThing.DestroyedOrNull())
                 {
                     QiCrystalList.Remove(tempThing);
@@ -592,9 +688,10 @@ namespace CultivatorOfTheRim
                 }*/
             }
             IReadOnlyList<Thing> sourceList = new List<Thing>(QiSourceList);
-            for (int i = 0;i < sourceList.Count - 1;i++)
+            for (int i = 0;i < sourceList.Count;i++)
             {
-                Thing tempThing = QiSourceList[i];
+
+                Thing tempThing = sourceList[i];
                 if (!tempThing.Spawned || tempThing.Map == null)
                 {
                     QiSourceList.Remove(tempThing);
@@ -648,36 +745,47 @@ namespace CultivatorOfTheRim
                     QiSourceWithValue.Remove(tempThing);
                 }*/
             }
-            foreach (var item in GenRadial.RadialDistinctThingsAround(Pawn.Position, Pawn.Map, 6f, true))
+            IReadOnlyList<Thing> crystalThingList = new List<Thing>(GenRadial.RadialDistinctThingsAround(Pawn.PositionHeld, Pawn.MapHeld, 6f, true));
+            for (var i = 0; i < crystalThingList.Count; i++)
             {
+                var item = crystalThingList[i];
+                if (item.DestroyedOrNull()) continue;
                 if (QiCrystalList.Contains(item))
                 {
                     continue;
                 }
+
                 if (item?.TryGetComp<CompQiStorage>()?.curStored <= 0)
                 {
                     continue;
                 }
-                if (!item.def.tradeTags.NullOrEmpty() && item.def.tradeTags.Contains("Qi_Source_Crystal"))
+
+                if (!item.HasTradeTag("Qi_Source_Crystal"))
                 {
                     QiCrystalList.Add(item);
                 }
             }
+
             bool flag = CultivatorOfTheRimMod.settings.isCultivatorNeedHighTierQi;
             int numTier = currentRealmTier;
             bool isQiGathering = Props.requireQiSource;
             string neededQiTier = Cultivation_Utility.neededQiTier(numTier);
-            foreach (var item in GenRadial.RadialDistinctThingsAround(Pawn.Position, Pawn.Map, 6f, true))
+            IReadOnlyList<Thing> itemThingList = new List<Thing>(GenRadial.RadialDistinctThingsAround(Pawn.PositionHeld, Pawn.MapHeld, 6f, true));
+            for (var i = 0; i < itemThingList.Count; i++)
             {
+                var item = itemThingList[i];
+                //if (item is Plant_SpiritPlant) continue;
+                if (item.DestroyedOrNull()) continue;
                 if (QiSourceList.Contains(item))
                 {
                     continue;
                 }
+
                 /*if (!GenSight.LineOfSightToThing(Pawn.Position, item, Pawn.Map))
                 {
                     continue;
                 }*/
-                if (!item.def.tradeTags.NullOrEmpty() && item.def.tradeTags.Contains("Qi_Source"))
+                if (item.def.HasTradeTag("Qi_Source"))
                 {
                     if (flag && isQiGathering)
                     {
@@ -686,6 +794,7 @@ namespace CultivatorOfTheRim
                             continue;
                         }
                     }
+
                     QiSourceList.Add(item);
                     foreach (var tag in item.def.tradeTags)
                     {
@@ -697,27 +806,40 @@ namespace CultivatorOfTheRim
                         {
                             QiSourceWithValue.SetOrAdd(item, num2);
                         }
+
                         if (text != null && text != "N/A")
                         {
                             QisourceTypeWithStringCached.SetOrAdd(item, text);
                         }
                     }
-
                 }
             }
+
             if (!QiSourceWithType.NullOrEmpty())
             {
                 multiplierForQiType = 1f;
-                foreach (var item in QiSourceWithType)
+                IReadOnlyDictionary<Thing, float> keyValuePairs = new Dictionary<Thing, float>(QiSourceWithType);
+                foreach (var item in keyValuePairs)
                 {
+                    if (item.Key.DestroyedOrNull())
+                    {
+                        QiSourceWithType.Remove(item.Key);
+                        continue;
+                    }
                     multiplierForQiType *= item.Value;
                 }
             }
             if (!QiSourceWithValue.NullOrEmpty())
             {
                 totalSeverityChange = 0f;
-                foreach (var item in QiSourceWithValue)
+                IReadOnlyDictionary<Thing,float> keyValuePairs = new Dictionary<Thing,float>(QiSourceWithValue);
+                foreach (var item in keyValuePairs)
                 {
+                    if(item.Key.DestroyedOrNull())
+                    {
+                        QiSourceWithValue.Remove(item.Key);
+                        continue;
+                    }
                     totalSeverityChange += item.Value;
                 }
             }
@@ -728,133 +850,137 @@ namespace CultivatorOfTheRim
             {
                 return;
             }
-            isInitialChecked = true;
-            QiSourceList.Clear();
-            QiCrystalList.Clear();
-            QiSourceWithType.Clear();
-            QiSourceWithValue.Clear();
-            QisourceTypeWithStringCached.Clear();
-            itemToSpawnFleckList.Clear();
-            multiplierForQiType = 1f;
-            totalSeverityChange = 0f;
-            /*foreach (var item in QiSourceList)
+            try
             {
-                if(item.DestroyedOrNull() || item.Position.DistanceTo(Pawn.Position) > 6f)
-                {
-                    QiSourceList.Remove(item);
-                }
-            }*/
-            bool flag = CultivatorOfTheRimMod.settings.isCultivatorNeedHighTierQi;
-            int numTier = currentRealmTier;
-            bool isQiGathering = Props.requireQiSource;
-            string neededQiTier = Cultivation_Utility.neededQiTier(numTier);
-            foreach (var item in GenRadial.RadialDistinctThingsAround(Pawn.Position,Pawn.Map,6f,true))
-            {
-                if(QiCrystalList.Contains(item))
-                {
-                    continue;
-                }
-                if (item?.TryGetComp<CompQiStorage>()?.curStored <= 0)
-                {
-                    continue;
-                }
-                if(!item.def.tradeTags.NullOrEmpty() && item.def.tradeTags.Contains("Qi_Source_Crystal"))
-                {
-                    QiCrystalList.Add(item);
-                }
-            }
-            foreach (var item in GenRadial.RadialDistinctThingsAround(Pawn.Position, Pawn.Map, 6f, true))
-            {
-                if (QiSourceList.Contains(item))
-                {
-                    continue;
-                }
-                /*if (!GenSight.LineOfSightToThing(Pawn.Position, item, Pawn.Map))
-                {
-                    continue;
-                }*/
-                if (!item.def.tradeTags.NullOrEmpty() && item.def.tradeTags.Contains("Qi_Source"))
-                {
-                    if(flag && isQiGathering)
-                    {
-                        if(!item.def.tradeTags.Contains(neededQiTier))
-                        {
-                            continue;
-                        }
-                    }
-                    QiSourceList.Add(item);
-                    foreach(string item2 in item.def.tradeTags)
-                    {
-                        float num = Cultivation_Utility.getQiModifierForPawn(Pawn, item2);
-                        float num2 = Cultivation_Utility.getItemQiValueForPawn(item2);
-                        string text = Cultivation_Utility.getQiTypeString(item2);
-                        QiSourceWithType.SetOrAdd(item,num);
-                        if (num2 > 0 && !QiSourceWithValue.Keys.Contains(item))
-                        {
-                            QiSourceWithValue.Add(item, num2);
-                        }
-                        if (text != null && text != "N/A")
-                        {
-                            QisourceTypeWithStringCached.SetOrAdd(item, text);
-                        }
-                    }
-                    
-                }
-            }
-            if(!QiSourceWithType.NullOrEmpty())
-            {
+                isInitialChecked = true;
+                QiSourceList.Clear();
+                QiCrystalList.Clear();
+                QiSourceWithType.Clear();
+                QiSourceWithValue.Clear();
+                QisourceTypeWithStringCached.Clear();
+                itemToSpawnFleckList.Clear();
                 multiplierForQiType = 1f;
-                foreach(var item in QiSourceWithType)
-                {
-                    multiplierForQiType *= item.Value;
-                }
-            }
-            if(!QiSourceWithValue.NullOrEmpty())
-            {
                 totalSeverityChange = 0f;
-                foreach (var item in QiSourceWithValue)
+
+                bool flag = CultivatorOfTheRimMod.settings.isCultivatorNeedHighTierQi;
+                int numTier = currentRealmTier;
+                bool isQiGathering = Props.requireQiSource;
+                string neededQiTier = Cultivation_Utility.neededQiTier(numTier);
+                IReadOnlyList<Thing> crystalThings = new List<Thing>(GenRadial.RadialDistinctThingsAround(Pawn.PositionHeld, Pawn.MapHeld, 6f, true));
+                for (var i = 0; i < crystalThings.Count; i++)
                 {
-                    totalSeverityChange += item.Value;
+                    var item = crystalThings[i];
+                    if (item.DestroyedOrNull()) continue;
+                    if (QiCrystalList.Contains(item))
+                    {
+                        continue;
+                    }
+
+                    if (item?.TryGetComp<CompQiStorage>()?.curStored <= 0)
+                    {
+                        continue;
+                    }
+
+                    if (!item.def.tradeTags.NullOrEmpty() && item.def.tradeTags.Contains("Qi_Source_Crystal"))
+                    {
+                        QiCrystalList.Add(item);
+                    }
+                }
+
+                IReadOnlyList<Thing> itemThings = [.. GenRadial.RadialDistinctThingsAround(Pawn.PositionHeld, Pawn.MapHeld, 6f, true)];
+                for (var i = 0; i < itemThings.Count; i++)
+                {
+                    var item = itemThings[i];
+                    //if (item is Plant_SpiritPlant) continue;
+                    if (item.DestroyedOrNull()) continue;
+                    if (QiSourceList.Contains(item))
+                    {
+                        continue;
+                    }
+
+                    /*if (!GenSight.LineOfSightToThing(Pawn.Position, item, Pawn.Map))
+                    {
+                        continue;
+                    }*/
+                    if (!item.def.tradeTags.NullOrEmpty() && item.def.tradeTags.Contains("Qi_Source"))
+                    {
+                        if (flag && isQiGathering)
+                        {
+                            if (!item.def.tradeTags.Contains(neededQiTier))
+                            {
+                                continue;
+                            }
+                        }
+
+                        QiSourceList.Add(item);
+                        foreach (string item2 in item.def.tradeTags)
+                        {
+                            float num = Cultivation_Utility.getQiModifierForPawn(Pawn, item2);
+                            float num2 = Cultivation_Utility.getItemQiValueForPawn(item2);
+                            string text = Cultivation_Utility.getQiTypeString(item2);
+                            QiSourceWithType.SetOrAdd(item, num);
+                            if (num2 > 0 && !QiSourceWithValue.Keys.Contains(item))
+                            {
+                                QiSourceWithValue.Add(item, num2);
+                            }
+
+                            if (text != null && text != "N/A")
+                            {
+                                QisourceTypeWithStringCached.SetOrAdd(item, text);
+                            }
+                        }
+                    }
+                }
+
+                if (!QiSourceWithType.NullOrEmpty())
+                {
+                    multiplierForQiType = 1f;
+                    foreach (var item in QiSourceWithType)
+                    {
+                        multiplierForQiType *= item.Value;
+                    }
+                }
+                if (!QiSourceWithValue.NullOrEmpty())
+                {
+                    totalSeverityChange = 0f;
+                    foreach (var item in QiSourceWithValue)
+                    {
+                        totalSeverityChange += item.Value;
+                    }
+                }
+                if (QiSourceList.NullOrEmpty())
+                {
+                    isNearbyQi = false;
+                }
+                else
+                {
+                    isNearbyQi = true;
                 }
             }
-            if (QiSourceList.NullOrEmpty())
+            catch (Exception ex)
             {
-                isNearbyQi = false;
+                Log.Message($"[CultivatorOfTheRim] Error ticking {Pawn.LabelShort}, something went wrong when cultivating." +
+                    $"\n{ex}");
             }
-            else
-            {
-                isNearbyQi = true;
-            }
-        }
-        public float breakthroughChance()
-        {
-            if (Pawn.RaceProps.Humanlike)
-            {
-                float baseNum = 1f;
-                float num = Pawn.health.summaryHealth.SummaryHealthPercent;
-                float num2 = Pawn.needs.mood.CurLevelPercentage;
-                float num3 = Pawn.health.capacities.GetLevel(PawnCapacityDefOf.Consciousness);
-                float final = baseNum * num * num2 * num3;
-                return final;
-            }
-            return 1f;
+            
         }
         public override IEnumerable<Gizmo> CompGetGizmos()
 		{
-            Command_Action breathrough = new Command_Action();
-            breathrough.defaultLabel = CultivatorOfTheRimMod.settings.isBreakthroughCanFailForHumanlike ? "Attempt to Breakthrough: " + Cultivation_Utility.GetBreakthroughChance(Pawn, Props.nextLevel).ToStringPercent("0.00") : "Attempt to Breakthrough";
-            if(Cultivation_Utility.realmListAll[parent.def] >= 6)
+            Command_Action breakthrough = new Command_Action();
+            breakthrough.defaultLabel = CultivatorOfTheRimMod.settings.isBreakthroughCanFailForHumanlike ? "Attempt to Breakthrough: " + Cultivation_Utility.GetBreakthroughChance(Pawn, false).ToStringPercent("0.00") : "Attempt to Breakthrough";
+            if(CulDef.realmPower >= 6)
             {
-                breathrough.defaultDesc = "Attempt to Breakthrough" + "\n" + "Tribulation Chance: " + Pawn.GetStatValue(CTR_DefOf.TribulationChance, cacheStaleAfterTicks: 250).ToStringPercent();
+                breakthrough.defaultDesc = "Attempt to Breakthrough" + "\n" + "Tribulation Chance: " + Pawn.GetStatValue(CTR_DefOf.TribulationChance, cacheStaleAfterTicks: 250).ToStringPercent();
             }
             else
             {
-                breathrough.defaultDesc = "Attempt to Breakthrough";
+                breakthrough.defaultDesc = "Attempt to Breakthrough";
             }
-            breathrough.icon = ContentFinder<Texture2D>.Get(Props.uiIcon);
-            breathrough.action = delegate
+            breakthrough.icon = Props.uiIconTexture;
+            breakthrough.action = delegate
             {
-                if (Props.nextLevel == null || Props.nextLevel == Props.currentLevel)
+                CultivationHediffDef nextLevel = (CultivationHediffDef)(Props.nextLevel != null ? Props.nextLevel : Props.nextLevels.RandomElementByWeight(x => x.weight).nextRealm);
+                if (nextLevel == null || nextLevel == Props.currentLevel)
                 {
                     Messages.Message("pawn has reach the peak, there no more higher realm than " + parent.Label, MessageTypeDefOf.NeutralEvent);
                 }
@@ -864,9 +990,9 @@ namespace CultivatorOfTheRim
                 }
                 else
                 {
-                    if (parent.Severity >= parent.def.maxSeverity && !Pawn.health.hediffSet.HasHediff(CTR_DefOf.CTR_BreakthroughProcess) && (Props.nextLevel != null && Props.currentLevel != Props.nextLevel))
+                    if (parent.Severity >= parent.def.maxSeverity && !Pawn.health.hediffSet.HasHediff(CTR_DefOf.CTR_BreakthroughProcess) && (nextLevel != null && Def != nextLevel))
                     {
-                        ((Hediff_CultivationLevel)parent).Cultivation_Advance(Props.shouldGetTribulation, Props.guaranteedTrib, Props.currentLevel, Props.nextLevel ?? Props.currentLevel, Props.breakingThroughDuration.RandomInRange, Props.TribulationStrikeInterval, Props.curves);
+                        ((Hediff_CultivationLevel)parent).Cultivation_Advance(Props.shouldGetTribulation, CulDef, nextLevel, Props.breakingThroughDuration.RandomInRange, Props.TribulationStrikeInterval);
                         Job job = JobMaker.MakeJob(CTR_DefOf.CTR_BreakingThrough, Pawn);
                         job.count = 1;
                         Pawn.jobs.TryTakeOrderedJob(job, JobTag.Misc);
@@ -877,7 +1003,7 @@ namespace CultivatorOfTheRim
                     }
                 }
             };
-            yield return breathrough;
+            yield return breakthrough;
             if (DebugSettings.godMode)
             {
                 yield return new Command_Action
@@ -937,7 +1063,7 @@ namespace CultivatorOfTheRim
         {
             if (parent.Severity >= parent.def.maxSeverity && !Pawn.health.hediffSet.HasHediff(CTR_DefOf.CTR_BreakthroughProcess) && (Props.nextLevel != null && Props.currentLevel != Props.nextLevel))
             {
-                ((Hediff_CultivationLevel)parent).Cultivation_Advance(Props.shouldGetTribulation, Props.guaranteedTrib, Props.currentLevel, Props.nextLevel ?? Props.currentLevel, Props.breakingThroughDuration.RandomInRange, Props.TribulationStrikeInterval, Props.curves);
+                ((Hediff_CultivationLevel)parent).Cultivation_Advance(Props.shouldGetTribulation, CulDef, (CultivationHediffDef)Props.nextLevel, Props.breakingThroughDuration.RandomInRange, Props.TribulationStrikeInterval);
                 Job job = JobMaker.MakeJob(CTR_DefOf.CTR_BreakingThrough, Pawn);
                 job.count = 1;
                 Pawn.jobs.TryTakeOrderedJob(job, JobTag.Misc);
@@ -952,8 +1078,11 @@ namespace CultivatorOfTheRim
                 float num = Props.severityPerTriggerRange.RandomInRange;
                 float sev = num;
                 //sev += Mathf.Min(Mathf.Max(totalSeverityChange,0f), Props.severityPerTriggerRange.max * 5);
-                sev += Mathf.Min(Mathf.Max(totalSeverityChange / 10,0f), 3f);
-                sev *= multiplierForQiType;
+                float num2 = Mathf.Min(Mathf.Max(totalSeverityChange / 10, 0f), 3f);
+                float num3 = multiplierForQiType * CultivatorOfTheRimMod.settings.globalQiTypeMultiplier;
+                num3 = Mathf.Max(num3,1f);
+                sev += num2;
+                sev *= num3;
                 sev *= CultivationSpeed;
                 if (QiSourceList.NullOrEmpty() && CultivatorOfTheRimMod.settings.isCultivatorNeedQiSourceToImprove)
                 {
@@ -973,7 +1102,8 @@ namespace CultivatorOfTheRim
                     {
                         if (Find.CameraDriver.CurrentViewRect.Contains(Pawn.Position))
                         {
-                            MoteMaker.ThrowText(Pawn.Position.ToVector3Shifted(), Pawn.Map, sev.ToString("0.000") + " ( " + num.ToString("0.000") + " + " + Mathf.Min(Mathf.Max(totalSeverityChange / 10, 0f), 3f) + " * " + multiplierForQiType + " ) ", Color.green);
+                            string text = $"{sev.ToString("0.00")} ( {num.ToString("0.00")} + {num2} * {num3} * {CultivationSpeed} )";
+                            MoteMaker.ThrowText(Pawn.Position.ToVector3Shifted(), Pawn.Map, text, Color.green);
                         }
                     }
                 }                                               

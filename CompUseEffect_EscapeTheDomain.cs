@@ -19,7 +19,7 @@ namespace CultivatorOfTheRim
             Hediff Creation = user.health.hediffSet.GetFirstHediffOfDef(CTR_DefOf.CTR_Creation_Realm);
             if(Creation != null )
             {
-                ((Hediff_CultivationLevel)Creation).Cultivation_Advance(true, true, CTR_DefOf.CTR_Creation_Realm, CTR_DefOf.CTR_OutsidetheDomain, 10000, 250);
+                ((Hediff_CultivationLevel)Creation).Cultivation_Advance(true, CTR_DefOf.CTR_Creation_Realm, CTR_DefOf.CTR_OutsidetheDomain, 10000, 250);
             }
             parent.stackCount = 1;
             /*Job job = JobMaker.MakeJob(CTR_DefOf.CTR_BreakingThrough, user);

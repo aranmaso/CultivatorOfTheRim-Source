@@ -15,15 +15,23 @@ namespace CultivatorOfTheRim
 
         public ThingDef failedProduct = CTR_DefOf.CTR_JunkPill;
 
+        public bool fixedIngredient = false;
+
         public IntRange count;
     }
 
     public class RecipeCombination
     {
+        public ThingDef firstThing;
+
+        public ThingDef secondThing;
+
         public string firstTag;
 
         public string secondTag;
 
         public ThingDef result;
+
+        public IntRange count;
     }
 }

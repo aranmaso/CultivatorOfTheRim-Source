@@ -61,7 +61,7 @@ namespace CultivatorOfTheRim
                     activeToggle.defaultLabel = "additonal attack: OFF";
                     activeToggle.defaultDesc = "pawn no longer launch additional attack";
                 }
-                activeToggle.icon = ContentFinder<Texture2D>.Get(Props.uiIcon);
+                activeToggle.icon = Props.icon;
                 activeToggle.isActive = () => isCurActivated;
                 activeToggle.toggleAction = delegate
                 {
@@ -77,6 +77,7 @@ namespace CultivatorOfTheRim
             if (dinfo.Instigator == Pawn) return;
             if (!isCurActivated) return;
             if (!Props.onAttacked) return;
+            if (dinfo.Def == DamageDefOf.SurgicalCut || dinfo.Def == DamageDefOf.ExecutionCut) return;
             if (Props.bonusDamageDef != null)
             {
                 if (Props.onlyUnarmed && Pawn.equipment.Primary != null)

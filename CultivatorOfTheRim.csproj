@@ -17,23 +17,25 @@
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\Cultivator of the Rim\Content\Assemblies\</OutputPath>
+    <OutputPath>D:\Steam\steamapps\common\RimWorld\Mods\Cultivator of the Rim\Current\Patches</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>D:\Steam\steamapps\common\RimWorld\Mods\Cultivator of the Rim\Current\Assemblies</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile></DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
@@ -56,6 +58,10 @@
       <HintPath>..\..\..\..\RimWorldWin64_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>..\..\..\..\RimWorldWin64_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
       <HintPath>..\..\..\..\RimWorldWin64_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
       <Private>False</Private>
@@ -64,6 +70,50 @@
   <ItemGroup>
     <Compile Include="BookOutcomeProperties_TechniqueManual.cs" />
     <Compile Include="BookOutcomeDoerTechniqueManual.cs" />
+    <Compile Include="BonusHediff.cs" />
+    <Compile Include="BreakThroughRealmInfo.cs" />
+    <Compile Include="CompAbilityEffect_VoidTear.cs" />
+    <Compile Include="CompProperties_AbilityEffectVoidTear.cs" />
+    <Compile Include="CompProperties_UseEffectBeastCoreAbsorption.cs" />
+    <Compile Include="CompProperties_UseEffectConsumeGenericPill.cs" />
+    <Compile Include="CompProperties_UseEffectConsumeQiPill.cs" />
+    <Compile Include="CompProperties_UseEffectPlaySound.cs" />
+    <Compile Include="CompProperties_UseEffectRebirth.cs" />
+    <Compile Include="CompUseEffect_BeastCoreAbsorption.cs" />
+    <Compile Include="CompUseEffect_ConsumeGenericPill.cs" />
+    <Compile Include="CompUseEffect_ConsumeQiPill.cs" />
+    <Compile Include="CompUseEffect_PlaySound.cs" />
+    <Compile Include="CompUseEffect_Rebirth.cs" />
+    <Compile Include="DebugToolsGeneral_CTR.cs" />
+    <Compile Include="ITab_Cultivation.cs" />
+    <Compile Include="Cultivation_AttachableThing.cs" />
+    <Compile Include="Hediff_CultivationBase.cs" />
+    <Compile Include="CultivationHediffStage.cs" />
+    <Compile Include="CultivationHediffDef.cs" />
+    <Compile Include="GameComponent_CultivatorCacheManager.cs" />
+    <Compile Include="PatchOperationAdd_SettingDependent.cs" />
+    <Compile Include="HediffComp_GiveAbilityCultivator.cs" />
+    <Compile Include="HediffCompProperties_GiveAbilityCultivator.cs" />
+    <Compile Include="CTR_SuperStartPatch.cs" />
+    <Compile Include="SpecialThingFilterWorker_ItemGrade.cs" />
+    <Compile Include="StaticUIIconCached.cs" />
+    <Compile Include="ThoughtWorker_BodyCultivation.cs" />
+    <Compile Include="Thing_PostApplyDamage_QiDamage.cs" />
+    <Compile Include="Thing_PostApplyDamage_BodyCultivator.cs" />
+    <Compile Include="HediffComp_BodyCultivation.cs" />
+    <Compile Include="HediffCompProperties_BodyCultivation.cs" />
+    <Compile Include="Hediff_BodyCultivaton.cs" />
+    <Compile Include="DefModExtension_RealmRankingPower.cs" />
+    <Compile Include="HediffStageData.cs" />
+    <Compile Include="Hediff_DynamicStage.cs" />
+    <Compile Include="IngestionOutcomeDoer_RebirthCultivation.cs" />
+    <Compile Include="Thing_PreApplyDamage_WeaponGradeCheck.cs" />
+    <Compile Include="HediffComp_CultivatorResurrect.cs" />
+    <Compile Include="HediffCompProperties_CultivatorResurrect.cs" />
+    <Compile Include="StaticCollectionCached.cs" />
+    <Compile Include="PawnGenerator_GenerateInitialHediffsPatch_FactionCultivation.cs" />
+    <Compile Include="FactionCultivationDef.cs" />
+    <Compile Include="JobDriver_LovinPatch.cs" />
     <Compile Include="DefGenerator_GenerateImpliedDefs_PreResolve_Patch.cs" />
     <Compile Include="PawnGenerator_GenerateInitialHediffsPatch.cs" />
     <Compile Include="StatPart_GradeDamage.cs" />
@@ -99,7 +149,7 @@
     <Compile Include="HediffCompProperties_AffectByTimeOfDay.cs" />
     <Compile Include="HediffComp_AffectByTimeOfDay.cs" />
     <Compile Include="WeatherEvent_LightningStrikeGiveSpiritItemPatch.cs" />
-    <Compile Include="Hediff_AbsorbingPill.cs" />
+    <Compile Include="HediffComp_AbsorbingPill.cs" />
     <Compile Include="HediffCompProperties_AbsorbingPill.cs" />
     <Compile Include="CompQiStorage.cs" />
     <Compile Include="CompProperties_QiStorage.cs" />
@@ -156,6 +206,12 @@
     <Publicize Include="Assembly-CSharp:RimWorld.StatWorker.stat" />
     <Publicize Include="Assembly-CSharp:RimWorld.WorkGiver_GrowerSow.ExtraRequirements" />
     <Publicize Include="Assembly-CSharp:RimWorld.WorkGiver_Grower.wantedPlantDef" />
+    <Publicize Include="Assembly-CSharp:RimWorld.JobDriver_Lovin.Partner" />
+    <Publicize Include="Assembly-CSharp:Verse.ThingWithComps.comps" />
+    <Publicize Include="Assembly-CSharp:Verse.ThingWithComps.compsByType" />
+    <Publicize Include="Assembly-CSharp:Verse.ListerThings.GroupIncludes" />
+    <Publicize Include="Assembly-CSharp:Verse.ListerThings.listsByGroup" />
+    <Publicize Include="Assembly-CSharp:Verse.ListerThings.stateHashByGroup" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

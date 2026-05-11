@@ -9,13 +9,13 @@ namespace CultivatorOfTheRim
     [HarmonyPatch("PreApplyDamage")]
     public class Pawn_PreApplyDamage_CultivatorCheck
     {
-        private static void Postfix(ref DamageInfo dinfo, ref bool absorbed, Pawn __instance)
+        public static void Postfix(ref DamageInfo dinfo, ref bool absorbed, Pawn __instance)
         {
             if (__instance.RaceProps.IsMechanoid)
             {
                 return;
             }
-            Hediff pawnCultivation = Cultivation_Utility.FindCultivationLevel(__instance);
+            Hediff_CultivationBase pawnCultivation = __instance.FindAnyCultivationLevel();
             HediffExtension_ByPassHediff modExtension = pawnCultivation?.def?.GetModExtension<HediffExtension_ByPassHediff>();
             if (modExtension == null || pawnCultivation == null)
             {
@@ -35,16 +35,16 @@ namespace CultivatorOfTheRim
             }
             if (dinfo.Instigator is Pawn attacker)
             {
-                if (!Cultivation_Utility.HaveCultivation(attacker))
+                if (!attacker.HaveAnyCultivation())
                 {
                     if(CultivatorOfTheRimMod.settings.isCultivatorOfGoldenCoreOrSaintAndUpImmuneToMortal)
                     {
-                        if (IsSaintRealmOrAbove(pawnCultivation))
+                        if (pawnCultivation.IsSaintRealmOrAbove())
                         {
                             dinfo.SetAmount(0);
                             return;
                         }
-                        else if (IsCoreShapingOrAbove(pawnCultivation))
+                        else if (pawnCultivation.IsCoreShapingOrAbove())
                         {
                             if (attacker.RaceProps.Humanlike)
                             {
@@ -90,30 +90,39 @@ namespace CultivatorOfTheRim
                             {
                                 dinfo.SetAmount(dinfo.Amount * 0.01f);
                             }
-
                         }
                     }
-                    
-                    
                 }
                 else
                 {
-                    Hediff h1 = pawnCultivation;
-                    Hediff h2 = Cultivation_Utility.FindCultivationLevel(attacker);
-                    if(h1.def == h2.def)
+                    Hediff_CultivationBase h1 = pawnCultivation;
+                    Hediff_CultivationBase h2 = attacker.FindAnyCultivationLevel();
+                    if (pawnCultivation.cultivationDef.realmPower >= 19)
+                    {
+                        if (h2.cultivationDef.realmPower < 19)
+                        {
+                            dinfo.SetAmount(0);
+                            return;
+                        }
+                    }
+                    if (h1.cultivationDef.realmPower == h2.cultivationDef.realmPower)
                     {
                         if(h1.Severity > h2.Severity)
                         {
                             dinfo.SetAmount(dinfo.Amount *0.75f);
                         }
+                        else
+                        {
+                            dinfo.SetAmount(dinfo.Amount * 1.25f);
+                        }
                     }
                     else
                     {
-                        HediffDef h3 = Cultivation_Utility.GetHighestCultivationHediff(h1.def, h2.def);
-                        if (h1.def == h3 && IsCoreShapingOrAbove(h1))
+                        CultivationHediffDef h3 = Cultivation_Utility.GetHighestCultivationHediff(h1.cultivationDef, h2.cultivationDef);
+                        if (h1.cultivationDef == h3 && h1.IsCoreShapingOrAbove())
                         {
-                            int realmDiff = Cultivation_Utility.GetRealmDifferent(h1.def, h2.def);
-                            if (realmDiff > 3)
+                            int realmDiff = Cultivation_Utility.GetRealmDifferent(h1.cultivationDef, h2.cultivationDef);
+                            if (realmDiff > CultivatorOfTheRimMod.settings.realmDifferentLimit)
                             {
                                 dinfo.SetAmount(0);
                             }
@@ -122,63 +131,65 @@ namespace CultivatorOfTheRim
                                 dinfo.SetAmount(dinfo.Amount / realmDiff);
                             }
                         }
+                        else if(h2.cultivationDef == h3 && h2.IsCoreShapingOrAbove())
+                        {
+                            int realmDiff = Cultivation_Utility.GetRealmDifferent(h1.cultivationDef, h2.cultivationDef);
+                            if (realmDiff > CultivatorOfTheRimMod.settings.realmDifferentLimit)
+                            {
+                                dinfo.SetAmount(dinfo.Amount * 2f);
+                            }
+                            else
+                            {
+                                dinfo.SetAmount(dinfo.Amount * damageCurve.Evaluate(realmDiff));
+                            }
+                        }
                     }                    
                 }
             }
-            /*else if ((dinfo.Instigator.def.thingClass.IsSubclassOf(typeof(Building_Turret))))
+            else if(dinfo.Instigator is Building building_Turret)
             {
-                if (dinfo.Instigator.def.tradeTags.Contains("Cultivator_Building"))
+                if (CultivatorOfTheRimMod.settings.isCultivatorOfGoldenCoreOrSaintAndUpImmuneToMortal)
                 {
-                    dinfo.SetAmount(dinfo.Amount * Rand.Range(0.25f, 0.5f));
-                }
-                else
-                {
-                    if (IsSaintRealmOrAbove(pawnCultivation))
+                    if (!building_Turret.def.tradeTags.NullOrEmpty() && building_Turret.def.tradeTags.Contains("Cultivator_Building"))
                     {
-                        dinfo.SetAmount(0);
+                        if (pawnCultivation.IsSaintRealmOrAbove())
+                        {
+                            dinfo.SetAmount(dinfo.Amount * Rand.Range(0.1f,0.25f));
+                        }
+                        else if (pawnCultivation.IsCoreShapingOrAbove())
+                        {
+                            dinfo.SetAmount(dinfo.Amount * Rand.Range(0.25f,0.5f));
+                        }
                     }
-                    else if (IsCoreShapingOrAbove(pawnCultivation))
+                    else
                     {
                         dinfo.SetAmount(dinfo.Amount * 0.01f);
                     }
                 }
-            }*/
-            else if(dinfo.Instigator is Building building_Turret)
-            {
-                if (!building_Turret.def.tradeTags.NullOrEmpty() && building_Turret.def.tradeTags.Contains("Cultivator_Building"))
-                {
-                    dinfo.SetAmount(dinfo.Amount * Rand.Range(0.25f, 0.5f));
-                }
             }
             else
             {
-                if (IsSaintRealmOrAbove(pawnCultivation))
+                if (CultivatorOfTheRimMod.settings.isCultivatorOfGoldenCoreOrSaintAndUpImmuneToMortal)
                 {
-                    dinfo.SetAmount(0);
-                }
-                else if (IsCoreShapingOrAbove(pawnCultivation))
-                {
-                    dinfo.SetAmount(dinfo.Amount * 0.01f);
+                    dinfo.SetAmount(dinfo.Amount * damageReductionCurve.Evaluate(pawnCultivation.cultivationDef.realmPower));
                 }
             }
         }
+        private static SimpleCurve damageCurve = new SimpleCurve()
+        {
+            {0,1.0f},
+            {3,2.0f},
+            {4,2.5f}
+        };
 
-        private static bool IsCoreShapingOrAbove(Hediff h)
+        private static SimpleCurve damageReductionCurve = new SimpleCurve()
         {
-            if(h.def.tags.Contains("CTR_CoreShapingOrAbove"))
-            {
-                return true;
-            }
-            return false;
-        }
-        private static bool IsSaintRealmOrAbove(Hediff h)
-        {
-            if(h.def.tags.Contains("CTR_SaintRealmOrAbove"))
-            {
-                return true;
-            }
-            return false;
-        }
+            {0,1.0f},
+            {19,0.1f},
+            {20,0.01f},
+        };
+
+
     }
     /*[HarmonyPatch(typeof(Pawn))]
     [HarmonyPatch("PreApplyDamage")]
@@ -489,7 +500,7 @@ namespace CultivatorOfTheRim
                 }
 
             }
-            *//*else if ((dinfo.Instigator is Building_Turret building_Turret)
+            else if ((dinfo.Instigator is Building_Turret building_Turret)
             {
                 if (dinfo.Instigator.def.tradeTags.Contains("Cultivator_Building"))
                 {
@@ -546,7 +557,7 @@ namespace CultivatorOfTheRim
                     }
                 }
 
-            }*//*
+            }
             else if (dinfo.Instigator is Building building_Turret)
             {
                 if (!building_Turret.def.tradeTags.NullOrEmpty() && building_Turret.def.tradeTags.Contains("Cultivator_Building"))
